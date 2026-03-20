@@ -158,7 +158,7 @@ users 1──────* habits 1──────* day_entries
 | `email` | VARCHAR(255) | UNIQUE, NOT NULL | Lowercase, trimmed |
 | `password_hash` | VARCHAR(255) | NOT NULL | bcrypt hash |
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | |
-| `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | See *Prisma `updated_at` (users & habits)* below — no DB `DEFAULT`; app layer sets on write |
 
 #### `habits`
 
@@ -171,7 +171,7 @@ users 1──────* habits 1──────* day_entries
 | `start_date` | DATE | NOT NULL | No entries before this date (FR19) |
 | `is_archived` | BOOLEAN | NOT NULL, default false | Archived habits hidden from active view (FR8) |
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | |
-| `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | |
+| `updated_at` | TIMESTAMPTZ | NOT NULL | Same as `users.updated_at` — Prisma `@updatedAt`; raw SQL inserts must supply `updated_at` |
 
 Index: `(user_id, is_archived)` — powers the active/archived habit list queries.
 
@@ -205,6 +205,8 @@ Index: `(habit_id, entry_date)` — powers calendar month queries and streak cal
 **Why `day_entries` as presence-based (not boolean)?** A row existing = day was marked done. No row = not done. This maps directly to the PRD's "empty square" design (FR18) and simplifies queries: a month's marks are a simple `SELECT entry_date WHERE habit_id = ? AND entry_date BETWEEN ? AND ?`. Unmarking a day means deleting the row.
 
 **Why is `start_date` immutable?** The start date anchors streak calculations, completion rate denominators, and the "no entries before this date" rule (FR19). Allowing edits would retroactively change statistics and create orphaned entries before a new start date. If a user picks the wrong date, they should delete and recreate the habit.
+
+**Prisma `updated_at` on `users` and `habits`:** Migrations use `NOT NULL` on `updated_at` **without** a database `DEFAULT now()`. Prisma’s `@updatedAt` sets and bumps this field on every create/update through the ORM. That matches runtime behavior (every row gets a value from the app) but differs from a literal “default now() at insert time” in pure SQL. **Raw SQL** (seeds, ad-hoc fixes, backups) that inserts into `users` or `habits` must include `updated_at` explicitly or the insert will fail.
 
 ### Timezone Strategy (NFR15)
 
