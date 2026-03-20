@@ -17,6 +17,7 @@ coverage/
 
 # Prisma generated client
 prisma/generated/
+server/src/generated/
 
 # IDE
 .vscode/

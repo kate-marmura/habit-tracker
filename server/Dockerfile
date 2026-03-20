@@ -4,6 +4,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 FROM deps AS build
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+RUN npx prisma generate
 COPY . .
 RUN npm run build
 
@@ -13,6 +16,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/src/generated ./src/generated
+COPY prisma ./prisma
+COPY prisma.config.ts ./
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 EXPOSE 3001
