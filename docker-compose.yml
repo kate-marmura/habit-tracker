@@ -16,6 +16,7 @@ services:
 
   server:
     build: ./server
+    profiles: ["prod"]
     ports:
       - "3001:3001"
     env_file: .env
@@ -31,6 +32,7 @@ services:
 
   client:
     build: ./client
+    profiles: ["prod"]
     ports:
       - "80:8080"
     depends_on:
