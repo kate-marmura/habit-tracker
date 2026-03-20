@@ -1,0 +1,17 @@
+{
+  "name": "habbit-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A habit tracking web application with calendar view, statistics, and AI coaching",
+  "scripts": {
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "lint:client": "npm run lint --prefix client",
+    "lint:server": "npm run lint --prefix server",
+    "format:client": "npm run format --prefix client",
+    "format:server": "npm run format --prefix server",
+    "test:e2e": "echo \"E2E tests not yet configured (E1-S6)\""
+  }
+}

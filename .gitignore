@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.dev
+.env.test
+
+# Coverage
+coverage/
+
+# macOS
+.DS_Store
+
+# Prisma generated client
+prisma/generated/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
