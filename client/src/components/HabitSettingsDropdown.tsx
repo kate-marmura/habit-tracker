@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 
 interface Props {
   onEdit: () => void;
+  onArchive?: () => void;
 }
 
-export default function HabitSettingsDropdown({ onEdit }: Props) {
+export default function HabitSettingsDropdown({ onEdit, onArchive }: Props) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -54,10 +55,23 @@ export default function HabitSettingsDropdown({ onEdit }: Props) {
               setOpen(false);
               onEdit();
             }}
-            className="w-full text-left px-4 py-2.5 text-sm text-text hover:bg-gray-50 transition rounded-lg"
+            className={`w-full text-left px-4 py-2.5 text-sm text-text hover:bg-gray-50 transition ${onArchive ? 'rounded-t-lg' : 'rounded-lg'}`}
           >
             Edit
           </button>
+          {onArchive && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onArchive();
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-b-lg"
+            >
+              Archive
+            </button>
+          )}
         </div>
       )}
     </div>

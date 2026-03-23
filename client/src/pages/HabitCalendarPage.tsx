@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchHabitById } from '../services/habitsApi';
+import { fetchHabitById, archiveHabit } from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import type { Habit } from '../types/habit';
@@ -62,6 +62,27 @@ export default function HabitCalendarPage() {
     setShowEditModal(false);
   }
 
+  async function handleArchive() {
+    if (!habit || !id) return;
+
+    const confirmed = window.confirm(
+      `Archive "${habit.name}"? It will be moved to your archived habits and removed from your active list.`,
+    );
+    if (!confirmed) return;
+
+    try {
+      await archiveHabit(id);
+      navigate('/habits', { replace: true });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') return;
+        setError(err.message);
+      } else {
+        setError('Could not archive habit. Please check your connection and try again.');
+      }
+    }
+  }
+
   if (!isAuthenticated) return null;
 
   return (
@@ -73,7 +94,10 @@ export default function HabitCalendarPage() {
           </h1>
           <div className="flex items-center gap-3">
             {habit && (
-              <HabitSettingsDropdown onEdit={() => setShowEditModal(true)} />
+              <HabitSettingsDropdown
+                onEdit={() => setShowEditModal(true)}
+                onArchive={!habit.isArchived ? handleArchive : undefined}
+              />
             )}
             <Link
               to="/habits"

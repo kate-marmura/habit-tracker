@@ -30,6 +30,7 @@ vi.mock('../services/habitsApi', () => ({
   fetchArchivedHabits: vi.fn(),
   fetchHabitById: vi.fn(),
   updateHabit: vi.fn(),
+  archiveHabit: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -60,6 +61,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+function HabitsListStub() {
+  return <div data-testid="habits-list-page">Habits List</div>;
+}
+
 function renderPage(habitId = 'abc-123') {
   seedAuth();
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -68,6 +73,7 @@ function renderPage(habitId = 'abc-123') {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Routes>
+            <Route path="/habits" element={<HabitsListStub />} />
             <Route path="/habits/:id" element={<HabitCalendarPage />} />
           </Routes>
         </AuthProvider>
@@ -252,5 +258,81 @@ describe('HabitCalendarPage', () => {
 
     expect(screen.getByText(/start date:/i)).toBeInTheDocument();
     expect(screen.getByText('2026-03-01')).toBeInTheDocument();
+  });
+
+  it('shows Archive option in settings dropdown for active habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.getByRole('menuitem', { name: /archive/i })).toBeInTheDocument();
+  });
+
+  it('does not show Archive option for already-archived habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.queryByRole('menuitem', { name: /archive/i })).not.toBeInTheDocument();
+  });
+
+  it('archives habit after confirmation and navigates to /habits', async () => {
+    const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(archiveHabit).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /archive/i }));
+
+    expect(window.confirm).toHaveBeenCalledWith(
+      expect.stringContaining('Archive "Exercise"'),
+    );
+    expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+  });
+
+  it('does not archive when confirmation is cancelled', async () => {
+    const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
+    vi.mocked(archiveHabit).mockClear();
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /archive/i }));
+
+    expect(vi.mocked(archiveHabit)).not.toHaveBeenCalled();
+    expect(screen.getByText('Exercise')).toBeInTheDocument();
+  });
+
+  it('shows error when archive API fails', async () => {
+    const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(archiveHabit).mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /archive/i }));
+
+    expect(await screen.findByText(/could not archive habit/i)).toBeInTheDocument();
   });
 });
