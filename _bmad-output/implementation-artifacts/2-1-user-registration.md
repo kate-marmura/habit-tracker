@@ -1,6 +1,6 @@
 # Story 2.1: User Registration
 
-Status: review
+Status: done
 
 ## Story
 

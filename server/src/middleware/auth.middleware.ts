@@ -17,10 +17,17 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 
   try {
     const token = header.slice(7);
-    const payload = jwt.verify(token, config.JWT_SECRET, { algorithms: ['HS256'] });
-    res.locals.userId = (payload as { sub: string }).sub;
+    const payload = jwt.verify(token, config.JWT_SECRET, { algorithms: ['HS256'] }) as Record<
+      string,
+      unknown
+    >;
+    if (typeof payload.sub !== 'string' || !payload.sub) {
+      throw new AppError(401, 'UNAUTHORIZED', 'Invalid token payload');
+    }
+    res.locals.userId = payload.sub;
     next();
-  } catch {
+  } catch (err) {
+    if (err instanceof AppError) throw err;
     throw new AppError(401, 'UNAUTHORIZED', 'Invalid or expired token');
   }
 }

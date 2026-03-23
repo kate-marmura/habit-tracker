@@ -28,7 +28,9 @@ function getAuthHeaders(): Record<string, string> {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (response.ok) {
-    return response.json() as Promise<T>;
+    const text = await response.text();
+    if (!text) return undefined as T;
+    return JSON.parse(text) as T;
   }
 
   if (response.status === 401) {

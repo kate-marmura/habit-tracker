@@ -75,10 +75,6 @@ export default function RegisterPage() {
       if (err instanceof ApiError) {
         if (err.status === 409) {
           setFieldErrors({ email: 'An account with this email already exists' });
-        } else if (err.status === 422) {
-          setError(err.message);
-        } else if (err.status === 429) {
-          setError(err.message);
         } else {
           setError(err.message);
         }
