@@ -1,4 +1,4 @@
-import { get, put, patch } from './api';
+import { get, put, patch, del } from './api';
 import type { Habit, UpdateHabitPayload } from '../types/habit';
 
 export function fetchActiveHabits(): Promise<Habit[]> {
@@ -23,4 +23,8 @@ export function archiveHabit(id: string): Promise<Habit> {
 
 export function unarchiveHabit(id: string): Promise<Habit> {
   return patch<Habit>(`/api/habits/${id}/unarchive`);
+}
+
+export function deleteHabit(id: string): Promise<{ deleted: boolean }> {
+  return del<{ deleted: boolean }>(`/api/habits/${id}`);
 }

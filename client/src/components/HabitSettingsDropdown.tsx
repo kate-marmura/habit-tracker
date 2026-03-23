@@ -4,9 +4,10 @@ interface Props {
   onEdit?: () => void;
   onArchive?: () => void;
   onUnarchive?: () => void;
+  onDelete?: () => void;
 }
 
-export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive }: Props) {
+export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +87,19 @@ export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive }
               className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition first:rounded-t-lg last:rounded-b-lg"
             >
               Archive
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onDelete();
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition first:rounded-t-lg last:rounded-b-lg"
+            >
+              Delete
             </button>
           )}
         </div>

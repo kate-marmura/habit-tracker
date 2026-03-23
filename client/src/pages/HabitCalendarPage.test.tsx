@@ -32,6 +32,7 @@ vi.mock('../services/habitsApi', () => ({
   updateHabit: vi.fn(),
   archiveHabit: vi.fn(),
   unarchiveHabit: vi.fn(),
+  deleteHabit: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -428,5 +429,49 @@ describe('HabitCalendarPage', () => {
 
     await user.click(screen.getByRole('button', { name: /habit settings/i }));
     expect(screen.queryByRole('menuitem', { name: /unarchive/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Delete option in dropdown for active habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.getByRole('menuitem', { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it('shows Delete option in dropdown for archived habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.getByRole('menuitem', { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it('opens delete modal from dropdown and navigates on success', async () => {
+    const { fetchHabitById, deleteHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(deleteHabit).mockResolvedValueOnce({ deleted: true });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /delete/i }));
+
+    expect(screen.getByText(/permanently delete/i)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(/type the habit name/i), 'Exercise');
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
   });
 });

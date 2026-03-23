@@ -147,6 +147,21 @@ export async function unarchiveHabit(userId: string, habitId: string) {
   return { ...habit, startDate: formatCalendarDate(habit.startDate) };
 }
 
+export async function deleteHabit(userId: string, habitId: string) {
+  const existing = await prisma.habit.findFirst({
+    where: { id: habitId, userId },
+    select: { id: true },
+  });
+
+  if (!existing) {
+    throw new AppError(404, 'NOT_FOUND', 'Habit not found');
+  }
+
+  await prisma.habit.delete({ where: { id: habitId } });
+
+  return { deleted: true };
+}
+
 export async function archiveHabit(userId: string, habitId: string) {
   const existing = await prisma.habit.findFirst({
     where: { id: habitId, userId },

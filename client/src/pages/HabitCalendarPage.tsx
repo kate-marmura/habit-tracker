@@ -5,6 +5,7 @@ import { ApiError } from '../services/api';
 import { fetchHabitById, archiveHabit, unarchiveHabit } from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
+import DeleteHabitModal from '../components/DeleteHabitModal';
 import type { Habit } from '../types/habit';
 
 export default function HabitCalendarPage() {
@@ -15,6 +16,7 @@ export default function HabitCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -120,11 +122,13 @@ export default function HabitCalendarPage() {
               <HabitSettingsDropdown
                 onEdit={() => setShowEditModal(true)}
                 onArchive={handleArchive}
+                onDelete={() => setShowDeleteModal(true)}
               />
             )}
             {habit?.isArchived && (
               <HabitSettingsDropdown
                 onUnarchive={handleUnarchive}
+                onDelete={() => setShowDeleteModal(true)}
               />
             )}
             <Link
@@ -168,6 +172,14 @@ export default function HabitCalendarPage() {
           habit={habit}
           onClose={() => setShowEditModal(false)}
           onSaved={handleSaved}
+        />
+      )}
+
+      {showDeleteModal && habit && (
+        <DeleteHabitModal
+          habit={habit}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleted={() => navigate('/habits', { replace: true })}
         />
       )}
     </div>
