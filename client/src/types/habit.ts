@@ -13,3 +13,8 @@ export interface CreateHabitPayload {
   description?: string;
   startDate: string;
 }
+
+export interface UpdateHabitPayload {
+  name: string;
+  description?: string;
+}

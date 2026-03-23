@@ -1,11 +1,20 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { ApiError } from '../services/api';
+import { fetchHabitById } from '../services/habitsApi';
+import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
+import EditHabitModal from '../components/EditHabitModal';
+import type { Habit } from '../types/habit';
 
 export default function HabitCalendarPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { id } = useParams<{ id: string }>();
+  const [habit, setHabit] = useState<Habit | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -13,28 +22,102 @@ export default function HabitCalendarPage() {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (!id?.trim()) {
+      setHabit(null);
+      setError('This habit link is invalid.');
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchHabitById(id);
+        if (!cancelled) setHabit(data);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError) {
+          if (err.code === 'REQUEST_ABORTED') return;
+          setError(err.message);
+        } else {
+          setError('Could not load habit. Please check your connection and try again.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, id]);
+
+  function handleSaved(updated: Habit) {
+    setHabit(updated);
+    setShowEditModal(false);
+  }
+
   if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-pink-500">Habit Calendar</h1>
-          <Link
-            to="/habits"
-            className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
-          >
-            Back to habits
-          </Link>
+          <h1 className="text-xl font-bold text-pink-500 truncate">
+            {loading ? 'Loading...' : habit?.name ?? 'Habit'}
+          </h1>
+          <div className="flex items-center gap-3">
+            {habit && (
+              <HabitSettingsDropdown onEdit={() => setShowEditModal(true)} />
+            )}
+            <Link
+              to="/habits"
+              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+            >
+              Back to habits
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="text-center py-16">
-          <p className="text-text-secondary mb-2">Calendar coming next</p>
-          <p className="text-xs text-muted">Habit ID: {id}</p>
-        </div>
+        {loading ? (
+          <div className="text-center py-16">
+            <p className="text-text-secondary">Loading habit...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-red-600 mb-4">{error}</p>
+            <Link
+              to="/habits"
+              className="text-pink-500 hover:text-pink-600 font-medium text-sm"
+            >
+              Back to habits
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-text-secondary mb-2">Calendar coming next</p>
+            {habit?.description && (
+              <p className="text-sm text-text-secondary mt-1">{habit.description}</p>
+            )}
+            <p className="text-xs text-muted mt-2">Started {habit?.startDate}</p>
+          </div>
+        )}
       </main>
+
+      {showEditModal && habit && (
+        <EditHabitModal
+          habit={habit}
+          onClose={() => setShowEditModal(false)}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 }
