@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-20
-last_updated: 2026-03-20T18:00:00
+last_updated: 2026-03-20T18:30:00
 project: habbit-tracker
 project_key: NOKEY
 tracking_system: file-system
@@ -47,7 +47,7 @@ development_status:
   1-1-initialize-monorepo-structure: done
   1-2-docker-containerization-compose-orchestration: done
   1-3-database-schema-prisma-setup: done
-  1-4-express-server-foundation: backlog
+  1-4-express-server-foundation: in-progress
   1-5-ci-pipeline-setup: backlog
   1-6-qa-test-infrastructure-setup: backlog
   epic-1-retrospective: optional
