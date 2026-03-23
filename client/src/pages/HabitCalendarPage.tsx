@@ -6,6 +6,7 @@ import { fetchHabitById, archiveHabit, unarchiveHabit } from '../services/habits
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
+import ConfirmModal from '../components/ConfirmModal';
 import type { Habit } from '../types/habit';
 
 export default function HabitCalendarPage() {
@@ -17,6 +18,7 @@ export default function HabitCalendarPage() {
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -64,25 +66,10 @@ export default function HabitCalendarPage() {
     setShowEditModal(false);
   }
 
-  async function handleArchive() {
-    if (!habit || !id) return;
-
-    const confirmed = window.confirm(
-      `Archive "${habit.name}"? It will be moved to your archived habits and removed from your active list.`,
-    );
-    if (!confirmed) return;
-
-    try {
-      await archiveHabit(id);
-      navigate('/habits', { replace: true });
-    } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.code === 'REQUEST_ABORTED') return;
-        setError(err.message);
-      } else {
-        setError('Could not archive habit. Please check your connection and try again.');
-      }
-    }
+  async function handleArchiveConfirm() {
+    if (!id) return;
+    await archiveHabit(id);
+    navigate('/habits', { replace: true });
   }
 
   async function handleUnarchive() {
@@ -121,7 +108,7 @@ export default function HabitCalendarPage() {
             {habit && !habit.isArchived && (
               <HabitSettingsDropdown
                 onEdit={() => setShowEditModal(true)}
-                onArchive={handleArchive}
+                onArchive={() => setShowArchiveModal(true)}
                 onDelete={() => setShowDeleteModal(true)}
               />
             )}
@@ -180,6 +167,17 @@ export default function HabitCalendarPage() {
           habit={habit}
           onClose={() => setShowDeleteModal(false)}
           onDeleted={() => navigate('/habits', { replace: true })}
+        />
+      )}
+
+      {showArchiveModal && habit && (
+        <ConfirmModal
+          title={`Archive \u2018${habit.name}\u2019?`}
+          message="It will be moved to your archived habits and removed from your active list."
+          confirmLabel="Archive"
+          confirmVariant="danger"
+          onConfirm={handleArchiveConfirm}
+          onCancel={() => setShowArchiveModal(false)}
         />
       )}
     </div>

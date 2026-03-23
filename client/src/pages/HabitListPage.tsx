@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchActiveHabits } from '../services/habitsApi';
+import { fetchActiveHabits, archiveHabit } from '../services/habitsApi';
 import CreateHabitModal from '../components/CreateHabitModal';
+import EditHabitModal from '../components/EditHabitModal';
+import DeleteHabitModal from '../components/DeleteHabitModal';
+import ConfirmModal from '../components/ConfirmModal';
 import HabitCard from '../components/HabitCard';
 import type { Habit } from '../types/habit';
 
@@ -15,6 +18,9 @@ export default function HabitListPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadNonce, setReloadNonce] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [archivingHabit, setArchivingHabit] = useState<Habit | null>(null);
+  const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -53,6 +59,24 @@ export default function HabitListPage() {
   function handleCreated(habit: Habit) {
     setHabits((prev) => [habit, ...prev]);
     setShowCreateModal(false);
+  }
+
+  function handleEditSaved(updated: Habit) {
+    setHabits((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+    setEditingHabit(null);
+  }
+
+  async function handleArchiveConfirm() {
+    if (!archivingHabit) return;
+    await archiveHabit(archivingHabit.id);
+    setHabits((prev) => prev.filter((h) => h.id !== archivingHabit.id));
+    setArchivingHabit(null);
+  }
+
+  function handleDeleted() {
+    if (!deletingHabit) return;
+    setHabits((prev) => prev.filter((h) => h.id !== deletingHabit.id));
+    setDeletingHabit(null);
   }
 
   if (!isAuthenticated) return null;
@@ -127,7 +151,13 @@ export default function HabitListPage() {
         ) : (
           <ul className="space-y-3">
             {habits.map((habit) => (
-              <HabitCard key={habit.id} habit={habit} />
+              <HabitCard
+                key={habit.id}
+                habit={habit}
+                onEdit={setEditingHabit}
+                onArchive={setArchivingHabit}
+                onDelete={setDeletingHabit}
+              />
             ))}
           </ul>
         )}
@@ -137,6 +167,33 @@ export default function HabitListPage() {
         <CreateHabitModal
           onClose={() => setShowCreateModal(false)}
           onCreated={handleCreated}
+        />
+      )}
+
+      {editingHabit && (
+        <EditHabitModal
+          habit={editingHabit}
+          onClose={() => setEditingHabit(null)}
+          onSaved={handleEditSaved}
+        />
+      )}
+
+      {archivingHabit && (
+        <ConfirmModal
+          title={`Archive \u2018${archivingHabit.name}\u2019?`}
+          message="It will be moved to your archived habits and removed from your active list."
+          confirmLabel="Archive"
+          confirmVariant="danger"
+          onConfirm={handleArchiveConfirm}
+          onCancel={() => setArchivingHabit(null)}
+        />
+      )}
+
+      {deletingHabit && (
+        <DeleteHabitModal
+          habit={deletingHabit}
+          onClose={() => setDeletingHabit(null)}
+          onDeleted={handleDeleted}
         />
       )}
     </div>

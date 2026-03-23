@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchArchivedHabits } from '../services/habitsApi';
+import { fetchArchivedHabits, unarchiveHabit } from '../services/habitsApi';
 import ArchivedHabitCard from '../components/ArchivedHabitCard';
+import DeleteHabitModal from '../components/DeleteHabitModal';
 import type { Habit } from '../types/habit';
 
 export default function ArchivedHabitsPage() {
@@ -13,6 +14,7 @@ export default function ArchivedHabitsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadNonce, setReloadNonce] = useState(0);
+  const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -48,6 +50,26 @@ export default function ArchivedHabitsPage() {
     return () => { cancelled = true; };
   }, [isAuthenticated, reloadNonce]);
 
+  async function handleUnarchive(habit: Habit) {
+    try {
+      await unarchiveHabit(habit.id);
+      setHabits((prev) => prev.filter((h) => h.id !== habit.id));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') return;
+        setError(err.message);
+      } else {
+        setError('Could not unarchive habit. Please check your connection and try again.');
+      }
+    }
+  }
+
+  function handleDeleted() {
+    if (!deletingHabit) return;
+    setHabits((prev) => prev.filter((h) => h.id !== deletingHabit.id));
+    setDeletingHabit(null);
+  }
+
   if (!isAuthenticated) return null;
 
   return (
@@ -65,13 +87,35 @@ export default function ArchivedHabitsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
+        {error && (
+          <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-4" role="alert">
+            {error}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-16">
             <p className="text-text-secondary">Loading archived habits...</p>
           </div>
-        ) : error ? (
+        ) : habits.length === 0 && !error ? (
           <div className="text-center py-16">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-text-secondary">No archived habits</p>
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {habits.map((habit) => (
+              <ArchivedHabitCard
+                key={habit.id}
+                habit={habit}
+                onUnarchive={handleUnarchive}
+                onDelete={setDeletingHabit}
+              />
+            ))}
+          </ul>
+        )}
+
+        {!loading && error && !habits.length && (
+          <div className="text-center py-4">
             <button
               type="button"
               onClick={() => setReloadNonce((n) => n + 1)}
@@ -80,18 +124,16 @@ export default function ArchivedHabitsPage() {
               Try again
             </button>
           </div>
-        ) : habits.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-text-secondary">No archived habits</p>
-          </div>
-        ) : (
-          <ul className="space-y-3">
-            {habits.map((habit) => (
-              <ArchivedHabitCard key={habit.id} habit={habit} />
-            ))}
-          </ul>
         )}
       </main>
+
+      {deletingHabit && (
+        <DeleteHabitModal
+          habit={deletingHabit}
+          onClose={() => setDeletingHabit(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </div>
   );
 }

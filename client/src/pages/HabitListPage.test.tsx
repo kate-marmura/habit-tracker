@@ -28,6 +28,8 @@ vi.mock('../services/api', () => ({
 vi.mock('../services/habitsApi', () => ({
   fetchActiveHabits: vi.fn(),
   fetchArchivedHabits: vi.fn(),
+  archiveHabit: vi.fn(),
+  deleteHabit: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -258,5 +260,60 @@ describe('HabitListPage', () => {
     await user.click(screen.getByRole('button', { name: /create habit/i }));
 
     expect(await screen.findByText(/could not create habit/i)).toBeInTheDocument();
+  });
+
+  it('opens edit modal from habit card Edit button', async () => {
+    const { fetchActiveHabits } = await import('../services/habitsApi');
+    vi.mocked(fetchActiveHabits).mockResolvedValueOnce(mockHabits);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /edit exercise/i }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('opens archive ConfirmModal from habit card Archive button', async () => {
+    const { fetchActiveHabits } = await import('../services/habitsApi');
+    vi.mocked(fetchActiveHabits).mockResolvedValueOnce(mockHabits);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /archive exercise/i }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/archive/i, { selector: 'h2' })).toBeInTheDocument();
+  });
+
+  it('removes habit from list after successful archive', async () => {
+    const { fetchActiveHabits, archiveHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchActiveHabits).mockResolvedValueOnce(mockHabits);
+    vi.mocked(archiveHabit).mockResolvedValueOnce({ ...mockHabits[0], isArchived: true });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /archive exercise/i }));
+    await user.click(screen.getByRole('button', { name: /^archive$/i }));
+
+    await vi.waitFor(() => {
+      expect(screen.queryByText('Exercise')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Read')).toBeInTheDocument();
+  });
+
+  it('opens delete modal from habit card Delete button', async () => {
+    const { fetchActiveHabits } = await import('../services/habitsApi');
+    vi.mocked(fetchActiveHabits).mockResolvedValueOnce(mockHabits);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /delete exercise/i }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

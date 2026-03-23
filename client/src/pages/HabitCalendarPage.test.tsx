@@ -288,11 +288,10 @@ describe('HabitCalendarPage', () => {
     expect(screen.queryByRole('menuitem', { name: /^archive$/i })).not.toBeInTheDocument();
   });
 
-  it('archives habit after confirmation and navigates to /habits', async () => {
+  it('opens ConfirmModal on archive and navigates to /habits on confirm', async () => {
     const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(archiveHabit).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     const user = userEvent.setup();
     renderPage();
@@ -301,17 +300,18 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('button', { name: /habit settings/i }));
     await user.click(screen.getByRole('menuitem', { name: /archive/i }));
 
-    expect(window.confirm).toHaveBeenCalledWith(
-      expect.stringContaining('Archive "Exercise"'),
-    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/archive/i, { selector: 'h2' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^archive$/i }));
+
     expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
   });
 
-  it('does not archive when confirmation is cancelled', async () => {
+  it('does not archive when ConfirmModal is cancelled', async () => {
     const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
     vi.mocked(archiveHabit).mockClear();
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
 
     const user = userEvent.setup();
     renderPage();
@@ -320,15 +320,17 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('button', { name: /habit settings/i }));
     await user.click(screen.getByRole('menuitem', { name: /archive/i }));
 
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
     expect(vi.mocked(archiveHabit)).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText('Exercise')).toBeInTheDocument();
   });
 
-  it('shows error when archive API fails', async () => {
+  it('shows error in ConfirmModal when archive API fails', async () => {
     const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(archiveHabit).mockRejectedValueOnce(new TypeError('Failed to fetch'));
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     const user = userEvent.setup();
     renderPage();
@@ -337,7 +339,10 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('button', { name: /habit settings/i }));
     await user.click(screen.getByRole('menuitem', { name: /archive/i }));
 
-    expect(await screen.findByText(/could not archive habit/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^archive$/i }));
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('shows Archived badge for an archived habit', async () => {

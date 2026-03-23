@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import ArchivedHabitCard from './ArchivedHabitCard';
 import type { Habit } from '../types/habit';
@@ -13,14 +14,22 @@ const mockHabit: Habit = {
   updatedAt: '2026-01-15T12:00:00.000Z',
 };
 
-function renderCard(habit = mockHabit) {
-  return render(
-    <MemoryRouter>
-      <ul>
-        <ArchivedHabitCard habit={habit} />
-      </ul>
-    </MemoryRouter>,
-  );
+function renderCard(overrides?: Partial<{ onUnarchive: (h: Habit) => void; onDelete: (h: Habit) => void }>) {
+  const defaults = {
+    onUnarchive: vi.fn(),
+    onDelete: vi.fn(),
+  };
+  const merged = { ...defaults, ...overrides };
+  return {
+    ...render(
+      <MemoryRouter>
+        <ul>
+          <ArchivedHabitCard habit={mockHabit} {...merged} />
+        </ul>
+      </MemoryRouter>,
+    ),
+    ...merged,
+  };
 }
 
 describe('ArchivedHabitCard', () => {
@@ -46,7 +55,37 @@ describe('ArchivedHabitCard', () => {
   });
 
   it('hides description when null', () => {
-    renderCard({ ...mockHabit, description: null });
+    render(
+      <MemoryRouter>
+        <ul>
+          <ArchivedHabitCard habit={{ ...mockHabit, description: null }} onUnarchive={vi.fn()} onDelete={vi.fn()} />
+        </ul>
+      </MemoryRouter>,
+    );
     expect(screen.queryByText('No longer active')).not.toBeInTheDocument();
+  });
+
+  it('has View icon button linking to /habits/:id', () => {
+    renderCard();
+    const viewLink = screen.getByRole('link', { name: /^view old habit$/i });
+    expect(viewLink).toHaveAttribute('href', '/habits/42');
+  });
+
+  it('calls onUnarchive when Unarchive button is clicked', async () => {
+    const onUnarchive = vi.fn();
+    const user = userEvent.setup();
+    renderCard({ onUnarchive });
+
+    await user.click(screen.getByRole('button', { name: /unarchive old habit/i }));
+    expect(onUnarchive).toHaveBeenCalledWith(mockHabit);
+  });
+
+  it('calls onDelete when Delete button is clicked', async () => {
+    const onDelete = vi.fn();
+    const user = userEvent.setup();
+    renderCard({ onDelete });
+
+    await user.click(screen.getByRole('button', { name: /delete old habit/i }));
+    expect(onDelete).toHaveBeenCalledWith(mockHabit);
   });
 });

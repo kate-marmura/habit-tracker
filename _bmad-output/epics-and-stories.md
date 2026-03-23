@@ -490,7 +490,7 @@ The following QA practices apply to every feature story, not just this setup sto
 - [ ] View navigates to `/habits/:id`; Edit opens `EditHabitModal` inline; Archive triggers confirmation
 - [ ] Reusable `ConfirmModal` component replaces `window.confirm` for archive — matches app modal design (backdrop, Escape, loading state, inline errors)
 - [ ] `ConfirmModal` used on both `HabitListPage` and `HabitCalendarPage` archive flows
-- [ ] `ArchivedHabitCard` gets Unarchive (`ArchiveRestore`) and Delete (`Trash2`) icon buttons — unarchive needs no confirmation; delete uses type-to-confirm `DeleteHabitModal`
+- [ ] `ArchivedHabitCard` gets View (`Eye`), Unarchive (`ArchiveRestore`), and Delete (`Trash2`) icon buttons — unarchive needs no confirmation; delete uses type-to-confirm `DeleteHabitModal`
 - [ ] After archive from list, habit removed from state immediately; after edit from list, card updates immediately
 
 **Refs:** FR7, FR8, FR8a, FR11 (UX enhancement of existing features — no new FRs)

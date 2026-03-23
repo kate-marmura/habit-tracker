@@ -71,7 +71,7 @@ development_status:
   3-5-view-archived-habit-read-only: done
   3-6-unarchive-a-habit: done
   3-7-delete-a-habit: done
-  3-8-habit-card-actions-and-confirm-modal: ready-for-dev
+  3-8-habit-card-actions-and-confirm-modal: done
   epic-3-retrospective: optional
 
   # Epic 4: Calendar View & Day Marking
