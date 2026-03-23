@@ -6,6 +6,7 @@ import { config } from './config.js';
 import { prisma } from './lib/prisma.js';
 import { AppError, errorHandler } from './middleware/error-handler.js';
 import { timezoneMiddleware } from './middleware/timezone.middleware.js';
+import apiRouter from './routes/index.js';
 
 const app = express();
 
@@ -48,7 +49,7 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
-// Future API routes: app.use('/api', router);
+app.use('/api', apiRouter);
 
 app.use((_req, _res, next) => {
   next(new AppError(404, 'NOT_FOUND', 'The requested resource was not found'));

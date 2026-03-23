@@ -1,6 +1,6 @@
 # Story 1.2: Docker Containerization & Compose Orchestration
 
-Status: review
+Status: done
 
 ## Story
 
