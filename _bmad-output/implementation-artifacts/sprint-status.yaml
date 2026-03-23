@@ -1,6 +1,6 @@
 # generated: 2026-03-20
 # last_updated: 2026-03-23
-# project: habbit-tracker
+# project: habit-tracker
 # project_key: NOKEY
 # tracking_system: file-system
 # story_location: _bmad-output/implementation-artifacts
@@ -35,8 +35,8 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-20
-last_updated: 2026-03-20
-project: habbit-tracker
+last_updated: 2026-03-23
+project: habit-tracker
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts

@@ -30,7 +30,7 @@ export async function sendPasswordResetEmail(params: {
   const info = await transporter.sendMail({
     from: config.FROM_EMAIL,
     to: params.to,
-    subject: 'Reset your Habbit Tracker password',
+    subject: 'Reset your Habit Tracker password',
     text: `You requested a password reset. Click the link below to set a new password:\n\n${params.resetUrl}\n\nThis link expires in 1 hour. If you didn't request this, you can safely ignore this email.`,
     html: `<p>You requested a password reset. Click the link below to set a new password:</p><p><a href="${params.resetUrl}">${params.resetUrl}</a></p><p>This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>`,
   });

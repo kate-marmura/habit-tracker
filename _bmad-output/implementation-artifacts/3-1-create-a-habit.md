@@ -56,7 +56,7 @@ so that I can begin tracking it.
 
 - [x] Task 4: Server integration tests (AC: #1–#5, #9)
   - [x] Add `server/src/__tests__/habits.create.test.ts` following `auth.change-password.test.ts` patterns (supertest + prisma + JWT)
-  - [x] Use a dedicated test user email domain (e.g. `habits-create@habbit-habits-test.com`) and delete user + habits in `afterAll`
+  - [x] Use a dedicated test user email domain (e.g. `habits-create@habit-habits-test.com`) and delete user + habits in `afterAll`
   - [x] Send `Authorization: Bearer <token>` and `X-Timezone: UTC` (or a fixed IANA zone) on every request
   - [x] Test: `201` creates habit; response includes `id`; `isArchived === false`
   - [x] Test: `startDate` stored as correct calendar date (read back from DB)

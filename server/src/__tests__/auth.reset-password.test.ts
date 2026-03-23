@@ -6,8 +6,8 @@ import app from '../app.js';
 import { prisma } from '../lib/prisma.js';
 import { RESET_PASSWORD_RATE_TEST_SLOT_HEADER } from '../middleware/rate-limit.middleware.js';
 
-const TEST_EMAIL = 'reset@habbit-reset-test.com';
-const SIBLING_EMAIL = 'reset-sibling@habbit-reset-test.com';
+const TEST_EMAIL = 'reset@habit-reset-test.com';
+const SIBLING_EMAIL = 'reset-sibling@habit-reset-test.com';
 const TEST_PASSWORD = 'OldPass1234';
 const NEW_PASSWORD = 'NewSecure1';
 const ALL_EMAILS = [TEST_EMAIL, SIBLING_EMAIL];

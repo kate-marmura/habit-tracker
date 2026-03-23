@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-habbit_tracker}
+      POSTGRES_DB: ${POSTGRES_DB:-habit_tracker}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -92,7 +92,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: habbit_tracker_test
+      POSTGRES_DB: habit_tracker_test
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s

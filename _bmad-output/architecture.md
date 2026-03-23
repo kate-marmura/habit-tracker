@@ -1,4 +1,4 @@
-# Architecture Document - Habbit Tracker
+# Architecture Document - Habit Tracker
 
 **Author:** Kate
 **Date:** March 18, 2026
@@ -8,7 +8,7 @@
 
 ## 1. System Overview
 
-Habbit Tracker is a calendar-centric habit tracking SPA. Users create habits, mark daily completions on a visual calendar grid, review statistics, and receive AI-powered coaching when struggling. The system is a standard three-tier web application: a React SPA frontend, a Node.js REST API backend, and a PostgreSQL database.
+Habit Tracker is a calendar-centric habit tracking SPA. Users create habits, mark daily completions on a visual calendar grid, review statistics, and receive AI-powered coaching when struggling. The system is a standard three-tier web application: a React SPA frontend, a Node.js REST API backend, and a PostgreSQL database.
 
 ### Architecture Style
 
@@ -551,7 +551,7 @@ If the LLM API call fails or times out:
 The coaching LLM receives a structured system prompt that enforces the PRD's tone requirements (FR27, FR28):
 
 ```
-You are a warm, supportive habit coach inside the Habbit Tracker app.
+You are a warm, supportive habit coach inside the Habit Tracker app.
 
 Rules:
 - Be practical: suggest one concrete action the user can take RIGHT NOW
@@ -675,7 +675,7 @@ No application-level cache needed for MVP. PostgreSQL's query cache and the smal
 ## 11. Project Structure (Monorepo)
 
 ```
-habbit-tracker/
+habit-tracker/
 ├── client/                    # React SPA
 │   ├── src/
 │   │   ├── main.tsx
@@ -796,7 +796,7 @@ Target: single VPS (e.g., DigitalOcean droplet, Railway, or Fly.io) for MVP.
 
 ```
 # Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/habbit_tracker
+DATABASE_URL=postgresql://user:pass@localhost:5432/habit_tracker
 
 # Auth
 JWT_SECRET=<256-bit random secret>
@@ -807,12 +807,12 @@ SMTP_HOST=<smtp server>
 SMTP_PORT=587
 SMTP_USER=<email>
 SMTP_PASS=<password>
-FROM_EMAIL=noreply@habbittracker.app
+FROM_EMAIL=noreply@habittracker.app
 
 # App
 NODE_ENV=production
 PORT=3001
-CLIENT_URL=https://habbittracker.app
+CLIENT_URL=https://habittracker.app
 
 # AI (Phase 2)
 # OPENAI_API_KEY=<key>

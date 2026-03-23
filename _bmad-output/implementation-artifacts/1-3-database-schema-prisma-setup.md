@@ -36,7 +36,7 @@ so that I can run migrations and have type-safe database access.
   - [x] Run `npx prisma init --datasource-provider postgresql` (creates `server/prisma/schema.prisma` and updates `.env`)
   - [x] Verify `datasource db` uses `provider = "postgresql"` and `url = env("DATABASE_URL")`
   - [x] Set `generator client` with `provider = "prisma-client"` (Prisma 7 uses `prisma-client` not `prisma-client-js`)
-  - [x] Verify DATABASE_URL in `.env` points to the Docker PostgreSQL: `postgresql://postgres:postgres@db:5432/habbit_tracker` (already configured from E1-S2)
+  - [x] Verify DATABASE_URL in `.env` points to the Docker PostgreSQL: `postgresql://postgres:postgres@db:5432/habit_tracker` (already configured from E1-S2)
 
 - [x] Task 3: Define `User` model (AC: #1, #2)
   - [x] Model name: `User` (maps to `users` table via `@@map("users")`)
@@ -64,7 +64,7 @@ so that I can run migrations and have type-safe database access.
 
 - [x] Task 7: Run initial migration (AC: #7)
   - [x] PostgreSQL running via `docker compose up db -d`
-  - [x] Used `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habbit_tracker` for host-to-container connection
+  - [x] Used `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habit_tracker` for host-to-container connection
   - [x] Ran `npx prisma migrate dev --name init` — migration applied successfully
   - [x] All 4 tables created with correct columns, types, constraints, and indexes
   - [x] Migration file at `server/prisma/migrations/20260320153004_init/migration.sql`
@@ -132,7 +132,7 @@ id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 When running `prisma migrate dev` from your host machine (outside Docker), the DATABASE_URL must use `localhost:5432`, not `db:5432`:
 
 ```bash
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/habbit_tracker" npx prisma migrate dev --name init
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/habit_tracker" npx prisma migrate dev --name init
 ```
 
 The `.env` file has `db` as the host (for Docker-to-Docker networking). Override with the command above, or temporarily edit `.env` for local Prisma commands.
@@ -182,7 +182,7 @@ volumes:
 
 **Docker:**
 - `docker-compose.yml` — db (postgres:16-alpine), server, client, dev and test profiles
-- `.env` — `DATABASE_URL=postgresql://postgres:postgres@db:5432/habbit_tracker`
+- `.env` — `DATABASE_URL=postgresql://postgres:postgres@db:5432/habit_tracker`
 - PostgreSQL accessible at `localhost:5432` from host, `db:5432` from containers
 
 ### What This Story Does NOT Include

@@ -3,7 +3,7 @@
 # Version: 6.2.0
 # Date: 2026-03-20T11:30:49.683Z
 
-project_name: habbit-tracker
+project_name: habit-tracker
 user_skill_level: intermediate
 planning_artifacts: "{project-root}/{output_folder}/planning-artifacts"
 implementation_artifacts: "{project-root}/{output_folder}/implementation-artifacts"

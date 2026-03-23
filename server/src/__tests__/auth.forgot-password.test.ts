@@ -7,11 +7,11 @@ import { prisma } from '../lib/prisma.js';
 import { transporter } from '../lib/email.js';
 import { config } from '../config.js';
 
-const BASIC_EMAIL = 'forgot-basic@habbit-forgot-test.com';
-const TOKEN_EMAIL = 'forgot-token@habbit-forgot-test.com';
-const REPLACE_EMAIL = 'forgot-replace@habbit-forgot-test.com';
-const RATE_EMAIL = 'forgot-rate@habbit-forgot-test.com';
-const NONEXISTENT_EMAIL = 'nobody@habbit-forgot-test.com';
+const BASIC_EMAIL = 'forgot-basic@habit-forgot-test.com';
+const TOKEN_EMAIL = 'forgot-token@habit-forgot-test.com';
+const REPLACE_EMAIL = 'forgot-replace@habit-forgot-test.com';
+const RATE_EMAIL = 'forgot-rate@habit-forgot-test.com';
+const NONEXISTENT_EMAIL = 'nobody@habit-forgot-test.com';
 const TEST_PASSWORD = 'StrongPass1';
 const ALL_EMAILS = [BASIC_EMAIL, TOKEN_EMAIL, REPLACE_EMAIL, RATE_EMAIL];
 

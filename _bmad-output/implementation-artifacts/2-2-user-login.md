@@ -208,7 +208,7 @@ import { loginLimiter } from '../middleware/rate-limit.middleware.js';
 ### LoginPage Visual Design
 
 Mirror the RegisterPage pattern (established in E2-S1) with these differences:
-- Title: "Habbit Tracker" with subtitle "Welcome back"
+- Title: "Habit Tracker" with subtitle "Welcome back"
 - `autoComplete="current-password"` on password input (not `new-password`)
 - No password strength indicators (not needed for login)
 - Two links below form: "Don't have an account? Sign up" → `/register`, "Forgot your password?" → `/forgot-password`
@@ -300,7 +300,7 @@ Claude claude-4.6-opus (Cursor)
 
 ### Debug Log References
 
-- **Test isolation fix**: Register tests use broad `deleteMany({ where: { email: { contains: '@test.com' } } })` which deletes login test users during parallel execution. Fixed by using a unique email domain (`@habbit-login-test.com`) for login tests to avoid collisions.
+- **Test isolation fix**: Register tests use broad `deleteMany({ where: { email: { contains: '@test.com' } } })` which deletes login test users during parallel execution. Fixed by using a unique email domain (`@habit-login-test.com`) for login tests to avoid collisions.
 - **API client 401 fix**: The existing `handleResponse` in `api.ts` unconditionally redirected to `/login` on any 401, preventing LoginPage from displaying error messages. Fixed by only redirecting when the user had an active token (session expiry), and reading the actual error body from 401 responses.
 
 ### Completion Notes List

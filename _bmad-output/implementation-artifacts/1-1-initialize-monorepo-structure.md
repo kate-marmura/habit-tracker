@@ -140,7 +140,7 @@ Document all variables needed across the project (values are safe defaults for l
 
 ```
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habbit_tracker
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habit_tracker
 
 # Auth
 JWT_SECRET=dev-secret-change-in-production-min-256-bits
@@ -151,7 +151,7 @@ JWT_EXPIRY=7d
 # SMTP_PORT=587
 # SMTP_USER=
 # SMTP_PASS=
-# FROM_EMAIL=noreply@habbittracker.app
+# FROM_EMAIL=noreply@habittracker.app
 
 # App
 NODE_ENV=development
@@ -168,7 +168,7 @@ CLIENT_URL=http://localhost:5173
 Final directory tree after this story should match:
 
 ```
-habbit-tracker/
+habit-tracker/
 ├── client/
 │   ├── src/
 │   │   ├── main.tsx

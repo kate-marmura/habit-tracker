@@ -1,4 +1,4 @@
-# Epics & Stories - Habbit Tracker
+# Epics & Stories - Habit Tracker
 
 **Author:** Kate
 **Date:** March 19, 2026

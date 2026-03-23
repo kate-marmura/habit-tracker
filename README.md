@@ -1,4 +1,4 @@
-# Habbit Tracker
+# Habit Tracker
 
 A habit tracking web application with a calendar-based interface, progress statistics, and AI coaching.
 
@@ -11,7 +11,7 @@ A habit tracking web application with a calendar-based interface, progress stati
 ## Project Structure
 
 ```
-habbit-tracker/
+habit-tracker/
 ├── client/              # React SPA (Vite + TypeScript)
 │   ├── Dockerfile       # Multi-stage build → Nginx
 │   └── nginx.conf       # SPA routing + API proxy
@@ -68,7 +68,7 @@ Health check: `curl http://localhost:3001/api/health`
    ```
 2. Update `DATABASE_URL` in `.env` to use `localhost` instead of `db`:
    ```
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habbit_tracker
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/habit_tracker
    ```
 3. Start the development servers:
    ```bash

@@ -7,7 +7,7 @@ import { prisma } from '../lib/prisma.js';
 import { config } from '../config.js';
 import { getTodayInTimezone } from '../lib/calendar-date.js';
 
-const TEST_EMAIL = 'habits-create@habbit-habits-test.com';
+const TEST_EMAIL = 'habits-create@habit-habits-test.com';
 const TEST_PASSWORD = 'StrongPass1';
 const TZ = 'UTC';
 

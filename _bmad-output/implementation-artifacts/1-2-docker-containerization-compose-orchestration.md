@@ -109,7 +109,7 @@ so that development, testing, and production environments are consistent and rep
   - [x] Test database service (`db-test`):
     - Image: `postgres:16-alpine`
     - Port: `5433:5432` (different host port to avoid conflicts)
-    - Separate environment: `POSTGRES_DB=habbit_tracker_test`
+    - Separate environment: `POSTGRES_DB=habit_tracker_test`
     - No persistent volume (ephemeral)
     - Health check same as main db
   - [x] Test runner services can be added later when test frameworks are configured (E1-S6)
@@ -118,8 +118,8 @@ so that development, testing, and production environments are consistent and rep
   - [x] Add Docker-specific env vars to `.env.example`:
     - `POSTGRES_USER=postgres`
     - `POSTGRES_PASSWORD=postgres`
-    - `POSTGRES_DB=habbit_tracker`
-  - [x] Update `DATABASE_URL` to use Docker service name: `postgresql://postgres:postgres@db:5432/habbit_tracker`
+    - `POSTGRES_DB=habit_tracker`
+  - [x] Update `DATABASE_URL` to use Docker service name: `postgresql://postgres:postgres@db:5432/habit_tracker`
   - [x] Document that `DATABASE_URL` uses `db` (Docker service name) not `localhost` when running in containers
   - [x] Create `.env` from `.env.example` for local dev (ensure `.env` is in `.gitignore` — already done in E1-S1)
 
@@ -208,8 +208,8 @@ The server dev command must be overridden to use `tsx watch` instead of `node di
 
 ### DATABASE_URL in Docker vs Local
 
-- **Docker (in container)**: `postgresql://postgres:postgres@db:5432/habbit_tracker` — uses `db` service name
-- **Local (outside container)**: `postgresql://postgres:postgres@localhost:5432/habbit_tracker` — uses `localhost`
+- **Docker (in container)**: `postgresql://postgres:postgres@db:5432/habit_tracker` — uses `db` service name
+- **Local (outside container)**: `postgresql://postgres:postgres@localhost:5432/habit_tracker` — uses `localhost`
 
 Document this difference clearly in `.env.example`.
 
@@ -249,7 +249,7 @@ No debug issues encountered. All tasks completed on first pass.
 - **Task 5:** Enhanced `/api/health` endpoint with PostgreSQL connectivity check using raw `pg` client. Returns `{ status: "ok", db: "connected" }` when DB is reachable, `{ status: "ok", db: "disconnected" }` with 200 when unreachable (keeps container healthy during DB startup). Reads DATABASE_URL from env.
 - **Task 6:** Created `docker-compose.yml` with db (postgres:16-alpine), server, and client services. Health checks on all services with appropriate intervals. `depends_on` with `condition: service_healthy` ensures startup order: db → server → client. Named volume `pgdata` for PostgreSQL persistence.
 - **Task 7:** Added dev profile with `server-dev` and `client-dev` services using `profiles: ["dev"]`. Source volume mounts for hot reload, anonymous volumes to protect container node_modules, debug port 9229 exposed for server, Vite dev server on port 5173 for client.
-- **Task 8:** Added test profile with `db-test` service (postgres:16-alpine on port 5433, ephemeral with no persistent volume, separate `habbit_tracker_test` database). Test runner services deferred to E1-S6.
+- **Task 8:** Added test profile with `db-test` service (postgres:16-alpine on port 5433, ephemeral with no persistent volume, separate `habit_tracker_test` database). Test runner services deferred to E1-S6.
 - **Task 9:** Updated `.env.example` with Docker-specific vars (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB). Updated DATABASE_URL to use Docker service name `db`. Added comment documenting Docker vs local hostname difference. Created `.env` from `.env.example`.
 - **Task 10:** Full verification completed: `docker compose up -d` successfully started all 3 services, db healthy, server healthy, client running. `curl http://localhost:3001/api/health` returned `{"status":"ok","db":"connected"}`. Logs accessible via `docker compose logs`. Clean shutdown with `docker compose down -v`.
 - **Note:** Dev profile verification (`docker compose --profile dev up`) was not run live as it requires building dev images; the configuration follows the documented patterns and the production compose verified the base images build correctly.

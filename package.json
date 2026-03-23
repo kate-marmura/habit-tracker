@@ -1,5 +1,5 @@
 {
-  "name": "habbit-tracker",
+  "name": "habit-tracker",
   "version": "0.1.0",
   "private": true,
   "description": "A habit tracking web application with calendar view, statistics, and AI coaching",

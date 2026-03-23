@@ -20,6 +20,6 @@ function renderWithProviders(initialRoute = '/habits') {
 describe('App', () => {
   it('renders without crashing', () => {
     renderWithProviders();
-    expect(screen.getByText('Habbit Tracker')).toBeInTheDocument();
+    expect(screen.getByText('Habit Tracker')).toBeInTheDocument();
   });
 });

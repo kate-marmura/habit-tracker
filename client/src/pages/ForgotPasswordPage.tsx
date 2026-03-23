@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-pink-500">Habbit Tracker</h1>
+            <h1 className="text-3xl font-bold text-pink-500">Habit Tracker</h1>
           </div>
 
           <div className="bg-surface rounded-xl shadow-sm border border-border p-8 text-center space-y-4">
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-pink-500">Habbit Tracker</h1>
+          <h1 className="text-3xl font-bold text-pink-500">Habit Tracker</h1>
           <p className="mt-2 text-text-secondary">Reset your password</p>
         </div>
 

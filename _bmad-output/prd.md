@@ -23,20 +23,20 @@ classification:
   projectContext: greenfield
 ---
 
-# Product Requirements Document - habbit-tracker
+# Product Requirements Document - habit-tracker
 
 **Author:** Kate
 **Date:** March 17, 2026
 
 ## Executive Summary
 
-Habbit Tracker is a web application for people who want to build or break habits and need visual proof of their progress. Target users are self-improvement-oriented individuals who find motivation in seeing patterns of consistency -- not just a streak number, but the full calendar picture of their effort over time.
+Habit Tracker is a web application for people who want to build or break habits and need visual proof of their progress. Target users are self-improvement-oriented individuals who find motivation in seeing patterns of consistency -- not just a streak number, but the full calendar picture of their effort over time.
 
-Existing habit trackers reduce progress to streak counters and stats dashboards, stripping away the visual context that makes progress feel real. Habbit Tracker solves this by making the calendar the primary interface: users set up habits (e.g., "quit smoking," "exercise daily"), then mark each day as complete or missed directly on a calendar view. The visual pattern of filled days becomes the core motivational feedback loop.
+Existing habit trackers reduce progress to streak counters and stats dashboards, stripping away the visual context that makes progress feel real. Habit Tracker solves this by making the calendar the primary interface: users set up habits (e.g., "quit smoking," "exercise daily"), then mark each day as complete or missed directly on a calendar view. The visual pattern of filled days becomes the core motivational feedback loop.
 
 ### What Makes This Special
 
-The calendar *is* the product. Where competitors treat calendar views as secondary or absent entirely, Habbit Tracker puts the day-by-day visual grid front and center. The core insight: a filled month of checkmarks speaks to the part of the brain that craves order and completeness far more powerfully than "Day 14" ever could. Users see the shape of their discipline -- the strong weeks, the recovery after a slip, the wall of consistency building over time. Statistics (longest streak, current streak, completion rate) complement the calendar but never replace it.
+The calendar *is* the product. Where competitors treat calendar views as secondary or absent entirely, Habit Tracker puts the day-by-day visual grid front and center. The core insight: a filled month of checkmarks speaks to the part of the brain that craves order and completeness far more powerfully than "Day 14" ever could. Users see the shape of their discipline -- the strong weeks, the recovery after a slip, the wall of consistency building over time. Statistics (longest streak, current streak, completion rate) complement the calendar but never replace it.
 
 ### Project Classification
 
@@ -134,7 +134,7 @@ The calendar *is* the product. Where competitors treat calendar views as seconda
 
 ### Journey 1: Kate Gets Started (Primary User -- First-Time Setup)
 
-Kate has been wanting to quit smoking for months. She's tried willpower alone, she's tried apps that just show streak numbers, but nothing clicks. She finds Habbit Tracker and creates an account in under a minute.
+Kate has been wanting to quit smoking for months. She's tried willpower alone, she's tried apps that just show streak numbers, but nothing clicks. She finds Habit Tracker and creates an account in under a minute.
 
 She taps "Add Habit," types "Quit Smoking," adds a short description of her goal, and picks today as her start date. The calendar appears -- a clean month grid, today highlighted, everything else empty. She taps today and marks it done. One small checkmark on a big empty canvas. It's not much yet, but it's hers.
 
@@ -144,7 +144,7 @@ Over the next two weeks, she adds a second habit: "30-minute walk." Now her cale
 
 ### Journey 2: Kate Hits a Wall (Primary User -- Struggle & AI Help)
 
-It's day 23 of quitting smoking. Kate had a terrible day at work, and the craving is overwhelming. She opens Habbit Tracker and looks at her calendar -- 22 consecutive checkmarks staring back at her. She doesn't want to break the pattern, but she's about to.
+It's day 23 of quitting smoking. Kate had a terrible day at work, and the craving is overwhelming. She opens Habit Tracker and looks at her calendar -- 22 consecutive checkmarks staring back at her. She doesn't want to break the pattern, but she's about to.
 
 She hits the "Help me" button on her Quit Smoking calendar. The app responds: "22 days is incredible, Kate. Before you decide anything -- try a 15-minute walk outside. Fresh air changes the chemistry. Check in with yourself after. You've got this, and whatever happens, tomorrow is a new square."
 
@@ -156,7 +156,7 @@ Two weeks later, on day 35, she slips. She doesn't mark the day. The next mornin
 
 ### Journey 3: Kate Reviews Her Progress (Primary User -- Statistics & Reflection)
 
-It's the end of Kate's second month. She opens Habbit Tracker and navigates to her "Quit Smoking" calendar. She scrolls through two full months -- the grid is almost entirely filled. One empty square in month one, two in month two. She can see the shape of her discipline.
+It's the end of Kate's second month. She opens Habit Tracker and navigates to her "Quit Smoking" calendar. She scrolls through two full months -- the grid is almost entirely filled. One empty square in month one, two in month two. She can see the shape of her discipline.
 
 She checks her stats: current streak is 18 days, longest streak was 34 days, overall completion rate is 95%. The numbers are nice, but it's the calendar that gets her -- two months of effort, visible and undeniable. She screenshots it and sends it to her sister.
 
@@ -190,7 +190,7 @@ She also wants to update her walking goal description and change her account pas
 
 ### Project-Type Overview
 
-Habbit Tracker is a Single Page Application (SPA) optimized for simplicity and fast interaction. The calendar-centric UI requires responsive, tap-friendly interactions without full page reloads. No SEO, real-time sync, or native mobile app requirements for MVP.
+Habit Tracker is a Single Page Application (SPA) optimized for simplicity and fast interaction. The calendar-centric UI requires responsive, tap-friendly interactions without full page reloads. No SEO, real-time sync, or native mobile app requirements for MVP.
 
 ### Technical Architecture Considerations
 

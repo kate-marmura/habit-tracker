@@ -6,7 +6,7 @@ import app from '../app.js';
 import { prisma } from '../lib/prisma.js';
 import { config } from '../config.js';
 
-const TEST_EMAIL = 'changepw@habbit-changepw-test.com';
+const TEST_EMAIL = 'changepw@habit-changepw-test.com';
 const ORIGINAL_PASSWORD = 'OriginalPass1';
 const NEW_PASSWORD = 'NewSecurePass2';
 

@@ -32,10 +32,10 @@ so that lint, type-check, and tests run on every push.
 - [x] Task 3: Configure PostgreSQL service container (AC: #6)
   - [x] Service: `postgres`
   - [x] Image: `postgres:16-alpine` (matches Docker Compose)
-  - [x] Environment: `POSTGRES_USER: postgres`, `POSTGRES_PASSWORD: postgres`, `POSTGRES_DB: habbit_tracker_test`
+  - [x] Environment: `POSTGRES_USER: postgres`, `POSTGRES_PASSWORD: postgres`, `POSTGRES_DB: habit_tracker_test`
   - [x] Health check: `pg_isready` with interval 10s, timeout 5s, retries 5
   - [x] Expose port 5432
-  - [x] Set `DATABASE_URL` as job-level env var: `postgresql://postgres:postgres@localhost:5432/habbit_tracker_test`
+  - [x] Set `DATABASE_URL` as job-level env var: `postgresql://postgres:postgres@localhost:5432/habit_tracker_test`
 
 - [x] Task 4: Configure Node.js environment
   - [x] Runner: `ubuntu-latest`
@@ -121,7 +121,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: habbit_tracker_test
+          POSTGRES_DB: habit_tracker_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -131,7 +131,7 @@ jobs:
           - 5432:5432
 
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/habbit_tracker_test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/habit_tracker_test
       JWT_SECRET: ci-test-secret-must-be-at-least-32-characters-long
       NODE_ENV: test
 
@@ -194,7 +194,7 @@ For npm caching with a monorepo, the `actions/setup-node@v4` `cache` option need
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/habbit_tracker_test` | PostgreSQL service container connection |
+| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/habit_tracker_test` | PostgreSQL service container connection |
 | `JWT_SECRET` | `ci-test-secret-must-be-at-least-32-characters-long` | Satisfies zod validation (min 32 chars) in config.ts |
 | `NODE_ENV` | `test` | Test environment mode |
 

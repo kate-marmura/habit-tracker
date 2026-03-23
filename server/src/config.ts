@@ -11,7 +11,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  FROM_EMAIL: z.string().email().optional().default('noreply@habbittracker.app'),
+  FROM_EMAIL: z.string().email().optional().default('noreply@habittracker.app'),
 })
   .superRefine((data, ctx) => {
     if (data.NODE_ENV !== 'production') return;
