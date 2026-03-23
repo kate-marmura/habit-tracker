@@ -38,7 +38,7 @@ export default function HabitCalendarPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchHabitById(id);
+        const data = await fetchHabitById(id!);
         if (!cancelled) setHabit(data);
       } catch (err) {
         if (cancelled) return;
