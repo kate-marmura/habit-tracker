@@ -20,3 +20,7 @@ export function updateHabit(id: string, payload: UpdateHabitPayload): Promise<Ha
 export function archiveHabit(id: string): Promise<Habit> {
   return patch<Habit>(`/api/habits/${id}/archive`);
 }
+
+export function unarchiveHabit(id: string): Promise<Habit> {
+  return patch<Habit>(`/api/habits/${id}/unarchive`);
+}

@@ -12,7 +12,7 @@
 |---|------|---------|----------|-------------|
 | E1 | Project Setup & Infrastructure | 6 | P0 | Monorepo scaffolding, Docker, database, QA infrastructure, CI pipeline |
 | E2 | User Authentication | 6 | P0 | Registration, login, logout, password management |
-| E3 | Habit Management | 7 | P0 | Habit CRUD, archiving, unarchiving, deletion, active limit enforcement |
+| E3 | Habit Management | 8 | P0 | Habit CRUD, archiving, unarchiving, deletion, active limit enforcement, card actions & confirm modal |
 | E4 | Calendar View & Day Marking | 7 | P0 | Calendar grid, tap-to-mark, month navigation, optimistic UI |
 | E5 | Progress & Statistics | 3 | P1 | Streak calculation, completion rate, stats panel |
 | E6 | AI Coaching | 4 | Phase 2 | LLM integration, help-me button, graceful degradation (deferred from MVP) |
@@ -475,6 +475,25 @@ The following QA practices apply to every feature story, not just this setup sto
 - [ ] Returns `404` if habit doesn't exist or doesn't belong to user
 
 **Refs:** FR8b, Architecture §5 (Habits endpoints)
+
+---
+
+### E3-S8: Habit Card Action Buttons & Custom Archive Confirmation
+
+**As a** user,
+**I want** quick-action icon buttons on each habit card and a polished confirmation dialog when archiving,
+**so that** I can view, edit, or archive habits directly from the list without navigating away, and the archive confirmation feels integrated with the app's design.
+
+**Acceptance Criteria:**
+
+- [ ] Each `HabitCard` displays three icon buttons (lucide-react): View (`Eye`), Edit (`Pencil`), Archive (`Archive`)
+- [ ] View navigates to `/habits/:id`; Edit opens `EditHabitModal` inline; Archive triggers confirmation
+- [ ] Reusable `ConfirmModal` component replaces `window.confirm` for archive — matches app modal design (backdrop, Escape, loading state, inline errors)
+- [ ] `ConfirmModal` used on both `HabitListPage` and `HabitCalendarPage` archive flows
+- [ ] `ArchivedHabitCard` gets an Unarchive icon button (`ArchiveRestore`) — no confirmation needed
+- [ ] After archive from list, habit removed from state immediately; after edit from list, card updates immediately
+
+**Refs:** FR7, FR8, FR8a, FR11 (UX enhancement of existing features — no new FRs)
 
 ---
 

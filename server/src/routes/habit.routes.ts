@@ -8,6 +8,7 @@ import {
   getHabitById,
   updateHabit,
   archiveHabit,
+  unarchiveHabit,
 } from '../services/habit.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
@@ -63,6 +64,12 @@ router.put('/:id', async (req, res) => {
 router.patch('/:id/archive', async (req, res) => {
   const id = habitIdParam.parse(req.params.id);
   const habit = await archiveHabit(res.locals.userId, id);
+  res.json(habit);
+});
+
+router.patch('/:id/unarchive', async (req, res) => {
+  const id = habitIdParam.parse(req.params.id);
+  const habit = await unarchiveHabit(res.locals.userId, id);
   res.json(habit);
 });
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchHabitById, archiveHabit } from '../services/habitsApi';
+import { fetchHabitById, archiveHabit, unarchiveHabit } from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import type { Habit } from '../types/habit';
@@ -83,6 +83,22 @@ export default function HabitCalendarPage() {
     }
   }
 
+  async function handleUnarchive() {
+    if (!id) return;
+
+    try {
+      await unarchiveHabit(id);
+      navigate('/habits', { replace: true });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') return;
+        setError(err.message);
+      } else {
+        setError('Could not unarchive habit. Please check your connection and try again.');
+      }
+    }
+  }
+
   if (!isAuthenticated) return null;
 
   return (
@@ -104,6 +120,11 @@ export default function HabitCalendarPage() {
               <HabitSettingsDropdown
                 onEdit={() => setShowEditModal(true)}
                 onArchive={handleArchive}
+              />
+            )}
+            {habit?.isArchived && (
+              <HabitSettingsDropdown
+                onUnarchive={handleUnarchive}
               />
             )}
             <Link

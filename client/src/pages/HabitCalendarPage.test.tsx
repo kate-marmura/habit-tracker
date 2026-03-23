@@ -31,6 +31,7 @@ vi.mock('../services/habitsApi', () => ({
   fetchHabitById: vi.fn(),
   updateHabit: vi.fn(),
   archiveHabit: vi.fn(),
+  unarchiveHabit: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -272,14 +273,18 @@ describe('HabitCalendarPage', () => {
     expect(screen.getByRole('menuitem', { name: /archive/i })).toBeInTheDocument();
   });
 
-  it('does not show settings dropdown for already-archived habit', async () => {
+  it('shows settings dropdown with only Unarchive for archived habit', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
 
+    const user = userEvent.setup();
     renderPage();
     await screen.findByText('Exercise');
 
-    expect(screen.queryByRole('button', { name: /habit settings/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.getByRole('menuitem', { name: /unarchive/i })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /^edit$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /^archive$/i })).not.toBeInTheDocument();
   });
 
   it('archives habit after confirmation and navigates to /habits', async () => {
@@ -342,14 +347,17 @@ describe('HabitCalendarPage', () => {
     expect(await screen.findByText('Archived')).toBeInTheDocument();
   });
 
-  it('hides settings dropdown entirely for archived habit', async () => {
+  it('does not show Edit or Archive in dropdown for archived habit', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
 
+    const user = userEvent.setup();
     renderPage();
     await screen.findByText('Exercise');
 
-    expect(screen.queryByRole('button', { name: /habit settings/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.queryByRole('menuitem', { name: /^edit$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /^archive$/i })).not.toBeInTheDocument();
   });
 
   it('does not show Archived badge for an active habit', async () => {
@@ -360,5 +368,65 @@ describe('HabitCalendarPage', () => {
     await screen.findByText('Exercise');
 
     expect(screen.queryByText('Archived')).not.toBeInTheDocument();
+  });
+
+  it('unarchives habit and navigates to /habits', async () => {
+    const { fetchHabitById, unarchiveHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+    vi.mocked(unarchiveHabit).mockResolvedValueOnce({ ...mockHabit, isArchived: false });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /unarchive/i }));
+
+    expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+  });
+
+  it('shows HABIT_LIMIT_REACHED error when unarchiving with 10 active habits', async () => {
+    const { fetchHabitById, unarchiveHabit } = await import('../services/habitsApi');
+    const { ApiError } = await import('../services/api');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+    vi.mocked(unarchiveHabit).mockRejectedValueOnce(
+      new ApiError(409, 'HABIT_LIMIT_REACHED', 'You can have up to 10 active habits.'),
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /unarchive/i }));
+
+    expect(await screen.findByText('You can have up to 10 active habits.')).toBeInTheDocument();
+  });
+
+  it('shows generic error when unarchive API fails with network error', async () => {
+    const { fetchHabitById, unarchiveHabit } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+    vi.mocked(unarchiveHabit).mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /unarchive/i }));
+
+    expect(await screen.findByText(/could not unarchive habit/i)).toBeInTheDocument();
+  });
+
+  it('does not show Unarchive for an active habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    expect(screen.queryByRole('menuitem', { name: /unarchive/i })).not.toBeInTheDocument();
   });
 });

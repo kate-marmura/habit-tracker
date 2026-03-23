@@ -111,6 +111,42 @@ export async function updateHabit(userId: string, habitId: string, input: Update
   return { ...habit, startDate: formatCalendarDate(habit.startDate) };
 }
 
+export async function unarchiveHabit(userId: string, habitId: string) {
+  const existing = await prisma.habit.findFirst({
+    where: { id: habitId, userId },
+    select: { id: true, isArchived: true },
+  });
+
+  if (!existing) {
+    throw new AppError(404, 'NOT_FOUND', 'Habit not found');
+  }
+
+  if (!existing.isArchived) {
+    const habit = await prisma.habit.findFirst({
+      where: { id: habitId, userId },
+      select: habitSelectFields,
+    });
+    if (!habit) throw new AppError(404, 'NOT_FOUND', 'Habit not found');
+    return { ...habit, startDate: formatCalendarDate(habit.startDate) };
+  }
+
+  const activeCount = await prisma.habit.count({
+    where: { userId, isArchived: false },
+  });
+
+  if (activeCount >= MAX_ACTIVE_HABITS) {
+    throw new AppError(409, 'HABIT_LIMIT_REACHED', 'You can have up to 10 active habits.');
+  }
+
+  const habit = await prisma.habit.update({
+    where: { id: habitId },
+    data: { isArchived: false },
+    select: habitSelectFields,
+  });
+
+  return { ...habit, startDate: formatCalendarDate(habit.startDate) };
+}
+
 export async function archiveHabit(userId: string, habitId: string) {
   const existing = await prisma.habit.findFirst({
     where: { id: habitId, userId },

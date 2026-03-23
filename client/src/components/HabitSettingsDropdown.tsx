@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 
 interface Props {
-  onEdit: () => void;
+  onEdit?: () => void;
   onArchive?: () => void;
+  onUnarchive?: () => void;
 }
 
-export default function HabitSettingsDropdown({ onEdit, onArchive }: Props) {
+export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive }: Props) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,17 +49,32 @@ export default function HabitSettingsDropdown({ onEdit, onArchive }: Props) {
           role="menu"
           className="absolute right-0 mt-1 w-40 bg-surface rounded-lg border border-border shadow-lg z-10"
         >
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onEdit();
-            }}
-            className={`w-full text-left px-4 py-2.5 text-sm text-text hover:bg-gray-50 transition ${onArchive ? 'rounded-t-lg' : 'rounded-lg'}`}
-          >
-            Edit
-          </button>
+          {onEdit && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onEdit();
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-text hover:bg-gray-50 transition first:rounded-t-lg last:rounded-b-lg"
+            >
+              Edit
+            </button>
+          )}
+          {onUnarchive && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onUnarchive();
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-text hover:bg-gray-50 transition first:rounded-t-lg last:rounded-b-lg"
+            >
+              Unarchive
+            </button>
+          )}
           {onArchive && (
             <button
               type="button"
@@ -67,7 +83,7 @@ export default function HabitSettingsDropdown({ onEdit, onArchive }: Props) {
                 setOpen(false);
                 onArchive();
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-b-lg"
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition first:rounded-t-lg last:rounded-b-lg"
             >
               Archive
             </button>
