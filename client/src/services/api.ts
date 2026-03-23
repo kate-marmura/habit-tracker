@@ -12,6 +12,15 @@ class ApiError extends Error {
   }
 }
 
+const activeControllers = new Set<AbortController>();
+
+export function cancelPendingRequests(): void {
+  for (const controller of activeControllers) {
+    controller.abort();
+  }
+  activeControllers.clear();
+}
+
 function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -69,47 +78,53 @@ async function handleResponse<T>(response: Response): Promise<T> {
   );
 }
 
+async function trackedFetch<T>(
+  path: string,
+  method: string,
+  data?: unknown,
+): Promise<T> {
+  const controller = new AbortController();
+  activeControllers.add(controller);
+
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers: getAuthHeaders(),
+      body: data ? JSON.stringify(data) : undefined,
+      signal: controller.signal,
+    });
+    return await handleResponse<T>(response);
+  } catch (error) {
+    const isAbortError =
+      (error instanceof DOMException && error.name === 'AbortError') ||
+      (error instanceof Error && error.name === 'AbortError');
+    if (isAbortError) {
+      throw new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled');
+    }
+    throw error;
+  } finally {
+    activeControllers.delete(controller);
+  }
+}
+
 export async function post<T>(path: string, data?: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: data ? JSON.stringify(data) : undefined,
-  });
-  return handleResponse<T>(response);
+  return trackedFetch<T>(path, 'POST', data);
 }
 
 export async function get<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<T>(response);
+  return trackedFetch<T>(path, 'GET');
 }
 
 export async function put<T>(path: string, data?: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: data ? JSON.stringify(data) : undefined,
-  });
-  return handleResponse<T>(response);
+  return trackedFetch<T>(path, 'PUT', data);
 }
 
 export async function patch<T>(path: string, data?: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: data ? JSON.stringify(data) : undefined,
-  });
-  return handleResponse<T>(response);
+  return trackedFetch<T>(path, 'PATCH', data);
 }
 
 export async function del<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<T>(response);
+  return trackedFetch<T>(path, 'DELETE');
 }
 
 export { ApiError };

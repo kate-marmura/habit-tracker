@@ -58,6 +58,9 @@ export default function LoginPage() {
       navigate('/habits');
     } catch (err) {
       if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') {
+          return;
+        }
         if (err.status === 401) {
           setError('Invalid email or password');
         } else {

@@ -4,11 +4,22 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 
 function HabitsPlaceholder() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-pink-500 mb-4">Habbit Tracker</h1>
         <p className="text-text-secondary">Habits page — coming in E3</p>
+        {isAuthenticated && (
+          <button
+            type="button"
+            onClick={logout}
+            className="mt-6 px-6 py-2 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition font-medium text-sm"
+          >
+            Log out
+          </button>
+        )}
       </div>
     </div>
   );

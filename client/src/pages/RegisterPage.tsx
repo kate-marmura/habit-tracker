@@ -73,6 +73,9 @@ export default function RegisterPage() {
       navigate('/habits');
     } catch (err) {
       if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') {
+          return;
+        }
         if (err.status === 409) {
           setFieldErrors({ email: 'An account with this email already exists' });
         } else {

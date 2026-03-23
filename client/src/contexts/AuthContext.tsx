@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { cancelPendingRequests } from '../services/api';
 
 interface User {
   id: string;
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    cancelPendingRequests();
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
