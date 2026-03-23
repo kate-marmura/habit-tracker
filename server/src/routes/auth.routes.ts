@@ -1,26 +1,34 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { commonPasswords } from '../data/common-passwords.js';
-import { register, login } from '../services/auth.service.js';
+import { register, login, changePassword } from '../services/auth.service.js';
 import { registerLimiter, loginLimiter } from '../middleware/rate-limit.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+
+const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(128, 'Password must be at most 128 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .refine((val) => !commonPasswords.has(val.toLowerCase()), {
+    message: 'This password is too common. Please choose a stronger password.',
+  });
 
 export const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email('Invalid email format').max(255),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(128, 'Password must be at most 128 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .refine((val) => !commonPasswords.has(val.toLowerCase()), {
-      message: 'This password is too common. Please choose a stronger password.',
-    }),
+  password: passwordSchema,
 });
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Invalid email format').max(255),
   password: z.string().min(1, 'Password is required'),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: passwordSchema,
 });
 
 const router = Router();
@@ -34,6 +42,12 @@ router.post('/register', registerLimiter, async (req, res) => {
 router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
   const result = await login(email, password);
+  res.status(200).json(result);
+});
+
+router.put('/change-password', authenticate, async (req, res) => {
+  const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+  const result = await changePassword(res.locals.userId, currentPassword, newPassword);
   res.status(200).json(result);
 });
 

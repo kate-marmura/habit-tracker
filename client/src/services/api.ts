@@ -45,18 +45,24 @@ async function handleResponse<T>(response: Response): Promise<T> {
   if (response.status === 401) {
     const body = await response.json().catch(() => null);
     const error = body?.error;
+    const code = error?.code || 'UNAUTHORIZED';
 
-    const hadToken = !!localStorage.getItem('token');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // End the client session unless the 401 is a "wrong password" style response where
+    // the user should stay signed in (change-password, login form, etc.).
+    const keepSessionOn401 = new Set(['INVALID_CURRENT_PASSWORD', 'INVALID_CREDENTIALS']);
+    if (!keepSessionOn401.has(code)) {
+      const hadToken = !!localStorage.getItem('token');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
 
-    if (hadToken) {
-      window.location.href = '/login';
+      if (hadToken) {
+        window.location.href = '/login';
+      }
     }
 
     throw new ApiError(
       401,
-      error?.code || 'UNAUTHORIZED',
+      code,
       error?.message || 'Authentication required',
     );
   }

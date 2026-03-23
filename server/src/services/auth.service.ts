@@ -54,3 +54,41 @@ export async function login(email: string, password: string) {
 
   return { token, user: { id: user.id, email: user.email } };
 }
+
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, passwordHash: true },
+  });
+
+  if (!user) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
+
+  const currentMatches = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!currentMatches) {
+    throw new AppError(401, 'INVALID_CURRENT_PASSWORD', 'Current password is incorrect');
+  }
+
+  const reusesCurrentPassword = await bcrypt.compare(newPassword, user.passwordHash);
+  if (reusesCurrentPassword) {
+    throw new AppError(
+      422,
+      'PASSWORD_UNCHANGED',
+      'New password must be different from your current password',
+    );
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash },
+  });
+
+  return { success: true, message: 'Password changed successfully' };
+}
