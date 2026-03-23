@@ -34,10 +34,22 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
 
   if (response.status === 401) {
+    const body = await response.json().catch(() => null);
+    const error = body?.error;
+
+    const hadToken = !!localStorage.getItem('token');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
-    throw new ApiError(401, 'UNAUTHORIZED', 'Authentication required');
+
+    if (hadToken) {
+      window.location.href = '/login';
+    }
+
+    throw new ApiError(
+      401,
+      error?.code || 'UNAUTHORIZED',
+      error?.message || 'Authentication required',
+    );
   }
 
   if (response.status === 429) {
