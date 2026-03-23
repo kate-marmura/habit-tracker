@@ -272,16 +272,14 @@ describe('HabitCalendarPage', () => {
     expect(screen.getByRole('menuitem', { name: /archive/i })).toBeInTheDocument();
   });
 
-  it('does not show Archive option for already-archived habit', async () => {
+  it('does not show settings dropdown for already-archived habit', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
 
-    const user = userEvent.setup();
     renderPage();
     await screen.findByText('Exercise');
 
-    await user.click(screen.getByRole('button', { name: /habit settings/i }));
-    expect(screen.queryByRole('menuitem', { name: /archive/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /habit settings/i })).not.toBeInTheDocument();
   });
 
   it('archives habit after confirmation and navigates to /habits', async () => {
@@ -334,5 +332,33 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('menuitem', { name: /archive/i }));
 
     expect(await screen.findByText(/could not archive habit/i)).toBeInTheDocument();
+  });
+
+  it('shows Archived badge for an archived habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+
+    renderPage();
+    expect(await screen.findByText('Archived')).toBeInTheDocument();
+  });
+
+  it('hides settings dropdown entirely for archived habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(screen.queryByRole('button', { name: /habit settings/i })).not.toBeInTheDocument();
+  });
+
+  it('does not show Archived badge for an active habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(screen.queryByText('Archived')).not.toBeInTheDocument();
   });
 });

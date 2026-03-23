@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
 import { fetchArchivedHabits } from '../services/habitsApi';
-import HabitCard from '../components/HabitCard';
+import ArchivedHabitCard from '../components/ArchivedHabitCard';
 import type { Habit } from '../types/habit';
 
 export default function ArchivedHabitsPage() {
@@ -87,7 +87,7 @@ export default function ArchivedHabitsPage() {
         ) : (
           <ul className="space-y-3">
             {habits.map((habit) => (
-              <HabitCard key={habit.id} habit={habit} />
+              <ArchivedHabitCard key={habit.id} habit={habit} />
             ))}
           </ul>
         )}

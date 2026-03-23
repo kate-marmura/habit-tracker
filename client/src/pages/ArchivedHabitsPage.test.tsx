@@ -134,14 +134,15 @@ describe('ArchivedHabitsPage', () => {
     expect(backLink).toHaveAttribute('href', '/habits');
   });
 
-  it('renders archived habits with links to calendar routes', async () => {
+  it('renders archived habits with ArchivedHabitCard and links', async () => {
     const { fetchArchivedHabits } = await import('../services/habitsApi');
     vi.mocked(fetchArchivedHabits).mockResolvedValueOnce(mockArchivedHabits);
 
     renderPage();
 
-    const habitLink = await screen.findByRole('link', { name: /view calendar for old habit/i });
+    const habitLink = await screen.findByRole('link', { name: /view archived habit old habit/i });
     expect(habitLink).toHaveAttribute('href', '/habits/10');
+    expect(screen.getByText('Archived')).toBeInTheDocument();
   });
 
   it('retries fetch when Try again is clicked', async () => {

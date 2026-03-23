@@ -89,14 +89,21 @@ export default function HabitCalendarPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-pink-500 truncate">
-            {loading ? 'Loading...' : habit?.name ?? 'Habit'}
-          </h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-xl font-bold text-pink-500 truncate">
+              {loading ? 'Loading...' : habit?.name ?? 'Habit'}
+            </h1>
+            {habit?.isArchived && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-muted shrink-0">
+                Archived
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-3">
-            {habit && (
+            {habit && !habit.isArchived && (
               <HabitSettingsDropdown
                 onEdit={() => setShowEditModal(true)}
-                onArchive={!habit.isArchived ? handleArchive : undefined}
+                onArchive={handleArchive}
               />
             )}
             <Link

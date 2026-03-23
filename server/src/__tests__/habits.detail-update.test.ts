@@ -117,6 +117,28 @@ describe('GET /api/habits/:id', () => {
 
     expect(res.status).toBe(401);
   });
+
+  it('returns 200 for an archived habit with isArchived true', async () => {
+    await prisma.habit.update({
+      where: { id: testHabitId },
+      data: { isArchived: true },
+    });
+
+    const res = await request(app)
+      .get(`/api/habits/${testHabitId}`)
+      .set('Authorization', `Bearer ${validToken}`)
+      .set('X-Timezone', TZ);
+
+    expect(res.status).toBe(200);
+    expect(res.body.id).toBe(testHabitId);
+    expect(res.body.isArchived).toBe(true);
+    expect(res.body.startDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    await prisma.habit.update({
+      where: { id: testHabitId },
+      data: { isArchived: false },
+    });
+  });
 });
 
 describe('PUT /api/habits/:id', () => {
