@@ -47,12 +47,13 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          path: |
-            server/node_modules
-            client/node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('server/package-lock.json', 'client/package-lock.json') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'server/package-lock.json', 'client/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
+
+      - name: Install root dependencies
+        run: npm ci
 
       - name: Install server dependencies
         run: npm ci
@@ -86,11 +87,16 @@ jobs:
         run: npm run lint
         working-directory: client
 
-      # Test frameworks configured in E1-S6
       - name: Test server
-        run: npm test --if-present
+        run: npm test
         working-directory: server
 
       - name: Test client
-        run: npm test --if-present
+        run: npm test
         working-directory: client
+
+      # E2E tests deferred until user flows exist (E2+)
+      # - name: Install Playwright browsers
+      #   run: npx playwright install --with-deps chromium
+      # - name: Run E2E tests
+      #   run: npm run test:e2e

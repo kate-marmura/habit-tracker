@@ -14,8 +14,12 @@
     "format:server": "npm run format --prefix server",
     "typecheck:client": "npx --prefix client tsc -b --noEmit",
     "typecheck:server": "npx --prefix server tsc --noEmit",
-    "test:client": "npm test --prefix client --if-present",
-    "test:server": "npm test --prefix server --if-present",
-    "test:e2e": "echo \"E2E tests not yet configured (E1-S6)\""
+    "test:client": "npm test --prefix client",
+    "test:server": "npm test --prefix server",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
   }
 }

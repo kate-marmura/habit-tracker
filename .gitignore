@@ -23,6 +23,11 @@ server/src/generated/
 .vscode/
 .idea/
 
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
 # Logs
 *.log
 npm-debug.log*
