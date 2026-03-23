@@ -135,3 +135,55 @@ export async function requestPasswordReset(email: string) {
 
   return RESET_RESPONSE;
 }
+
+export async function resetPassword(token: string, newPassword: string) {
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  const now = new Date();
+
+  return prisma.$transaction(async (tx) => {
+    const resetToken = await tx.passwordResetToken.findFirst({
+      where: {
+        tokenHash,
+        usedAt: null,
+        expiresAt: { gt: now },
+      },
+      select: { id: true, userId: true },
+    });
+
+    if (!resetToken) {
+      throw new AppError(400, 'INVALID_RESET_TOKEN', 'This password reset link is invalid or has expired');
+    }
+
+    const user = await tx.user.findUnique({
+      where: { id: resetToken.userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new AppError(400, 'INVALID_RESET_TOKEN', 'This password reset link is invalid or has expired');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+
+    await tx.user.update({
+      where: { id: user.id },
+      data: { passwordHash },
+    });
+
+    await tx.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { usedAt: now },
+    });
+
+    await tx.passwordResetToken.updateMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+        id: { not: resetToken.id },
+      },
+      data: { usedAt: now },
+    });
+
+    return { success: true, message: 'Password has been reset successfully' };
+  });
+}

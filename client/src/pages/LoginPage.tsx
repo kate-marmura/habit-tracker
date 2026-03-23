@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { post, ApiError } from '../services/api';
 
@@ -14,7 +14,10 @@ function isValidEmail(email: string): boolean {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  const locationMessage = (location.state as { message?: string } | null)?.message ?? null;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -86,6 +89,12 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+          {locationMessage && (
+            <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm" role="status">
+              {locationMessage}
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm" role="alert">
               {error}

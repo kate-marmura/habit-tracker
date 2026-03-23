@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-20
-last_updated: 2026-03-23
+last_updated: 2026-03-20
 project: habbit-tracker
 project_key: NOKEY
 tracking_system: file-system
@@ -53,13 +53,13 @@ development_status:
   epic-1-retrospective: done
 
   # Epic 2: User Authentication
-  epic-2: in-progress
+  epic-2: done
   2-1-user-registration: done
   2-2-user-login: done
   2-3-user-logout: done
   2-4-change-password: done
   2-5-forgot-password-request-reset: done
-  2-6-reset-password-complete-reset: backlog
+  2-6-reset-password-complete-reset: done
   epic-2-retrospective: optional
 
   # Epic 3: Habit Management
