@@ -7,6 +7,7 @@ import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
 import ConfirmModal from '../components/ConfirmModal';
+import CalendarGrid from '../components/CalendarGrid';
 import type { Habit } from '../types/habit';
 
 export default function HabitCalendarPage() {
@@ -144,10 +145,19 @@ export default function HabitCalendarPage() {
             </Link>
           </div>
         ) : (
-          <div className="text-center py-16">
-            <p className="text-text-secondary mb-2">Calendar coming next</p>
+          <div>
+            {habit && (() => {
+              const now = new Date();
+              return (
+                <CalendarGrid
+                  year={now.getFullYear()}
+                  month={now.getMonth() + 1}
+                  habitStartDate={habit.startDate}
+                />
+              );
+            })()}
             {habit?.description && (
-              <p className="text-sm text-text-secondary mt-1">{habit.description}</p>
+              <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
             )}
             <p className="text-xs text-muted mt-2">Started {habit?.startDate}</p>
           </div>

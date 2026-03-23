@@ -1,5 +1,5 @@
 # generated: 2026-03-20
-# last_updated: 2026-03-23
+# last_updated: 2026-03-23T12:00:00
 # project: habit-tracker
 # project_key: NOKEY
 # tracking_system: file-system
@@ -63,7 +63,7 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Habit Management
-  epic-3: in-progress
+  epic-3: done
   3-1-create-a-habit: done
   3-2-view-active-and-archived-habit-lists: done
   3-3-edit-a-habit: done
@@ -75,8 +75,8 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Calendar View & Day Marking
-  epic-4: backlog
-  4-1-calendar-grid-component: backlog
+  epic-4: in-progress
+  4-1-calendar-grid-component: done
   4-2-fetch-and-display-day-entries: backlog
   4-3-tap-to-mark-a-day-optimistic-ui: backlog
   4-4-tap-to-unmark-a-day-optimistic-ui: backlog

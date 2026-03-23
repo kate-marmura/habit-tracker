@@ -129,6 +129,17 @@ describe('HabitCalendarPage', () => {
     expect(screen.getByText(/started 2026-03-01/i)).toBeInTheDocument();
   });
 
+  it('renders CalendarGrid when habit loads successfully', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.queryByText(/calendar coming next/i)).not.toBeInTheDocument();
+  });
+
   it('shows error state on fetch failure', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockRejectedValueOnce(new TypeError('Failed to fetch'));
