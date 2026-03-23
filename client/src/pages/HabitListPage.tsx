@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { ApiError } from '../services/api';
+import { fetchActiveHabits } from '../services/habitsApi';
 import CreateHabitModal from '../components/CreateHabitModal';
+import HabitCard from '../components/HabitCard';
 import type { Habit } from '../types/habit';
 
 export default function HabitListPage() {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadNonce, setReloadNonce] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
@@ -15,6 +21,34 @@ export default function HabitListPage() {
       navigate('/login', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchActiveHabits();
+        if (!cancelled) setHabits(data);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError) {
+          if (err.code === 'REQUEST_ABORTED') return;
+          setError(err.message);
+        } else {
+          setError('Could not load habits. Please check your connection and try again.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, reloadNonce]);
 
   function handleCreated(habit: Habit) {
     setHabits((prev) => [habit, ...prev]);
@@ -29,6 +63,12 @@ export default function HabitListPage() {
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-pink-500">Habit Tracker</h1>
           <div className="flex gap-3">
+            <Link
+              to="/habits/archived"
+              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+            >
+              Archived
+            </Link>
             <Link
               to="/settings"
               className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
@@ -58,9 +98,24 @@ export default function HabitListPage() {
           </button>
         </div>
 
-        {habits.length === 0 ? (
+        {loading ? (
           <div className="text-center py-16">
-            <p className="text-text-secondary mb-4">No habits yet. Create your first one!</p>
+            <p className="text-text-secondary">Loading habits...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              type="button"
+              onClick={() => setReloadNonce((n) => n + 1)}
+              className="text-pink-500 hover:text-pink-600 font-medium text-sm"
+            >
+              Try again
+            </button>
+          </div>
+        ) : habits.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-text-secondary mb-4">Create your first habit</p>
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
@@ -72,18 +127,7 @@ export default function HabitListPage() {
         ) : (
           <ul className="space-y-3">
             {habits.map((habit) => (
-              <li
-                key={habit.id}
-                className="bg-surface rounded-xl border border-border p-4 flex items-start justify-between"
-              >
-                <div>
-                  <h3 className="font-medium text-text">{habit.name}</h3>
-                  {habit.description && (
-                    <p className="text-sm text-text-secondary mt-1">{habit.description}</p>
-                  )}
-                  <p className="text-xs text-muted mt-2">Started {habit.startDate}</p>
-                </div>
-              </li>
+              <HabitCard key={habit.id} habit={habit} />
             ))}
           </ul>
         )}

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { createHabit } from '../services/habit.service.js';
+import { createHabit, listActiveHabits, listArchivedHabits } from '../services/habit.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
 export const createHabitSchema = z.object({
@@ -16,6 +16,16 @@ export const createHabitSchema = z.object({
 const router = Router();
 
 router.use(authenticate);
+
+router.get('/archived', async (_req, res) => {
+  const habits = await listArchivedHabits(res.locals.userId);
+  res.json(habits);
+});
+
+router.get('/', async (_req, res) => {
+  const habits = await listActiveHabits(res.locals.userId);
+  res.json(habits);
+});
 
 router.post('/', async (req, res) => {
   const input = createHabitSchema.parse(req.body);

@@ -6,6 +6,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 import HabitListPage from './pages/HabitListPage';
+import ArchivedHabitsPage from './pages/ArchivedHabitsPage';
+import HabitCalendarPage from './pages/HabitCalendarPage';
 
 function RootRedirect() {
   const { isAuthenticated } = useAuth();
@@ -22,6 +24,8 @@ function App() {
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/habits" element={<HabitListPage />} />
+      <Route path="/habits/archived" element={<ArchivedHabitsPage />} />
+      <Route path="/habits/:id" element={<HabitCalendarPage />} />
     </Routes>
   );
 }

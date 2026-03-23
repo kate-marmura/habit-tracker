@@ -10,6 +10,16 @@ interface CreateHabitInput {
   startDate: string;
 }
 
+const habitSelectFields = {
+  id: true,
+  name: true,
+  description: true,
+  startDate: true,
+  isArchived: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 export async function createHabit(userId: string, input: CreateHabitInput, timezone: string) {
   const today = getTodayInTimezone(timezone);
   if (input.startDate > today) {
@@ -33,19 +43,31 @@ export async function createHabit(userId: string, input: CreateHabitInput, timez
       description,
       startDate: parseCalendarDate(input.startDate),
     },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      startDate: true,
-      isArchived: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: habitSelectFields,
   });
 
   return {
     ...habit,
     startDate: formatCalendarDate(habit.startDate),
   };
+}
+
+export async function listActiveHabits(userId: string) {
+  const habits = await prisma.habit.findMany({
+    where: { userId, isArchived: false },
+    orderBy: { createdAt: 'desc' },
+    select: habitSelectFields,
+  });
+
+  return habits.map((h) => ({ ...h, startDate: formatCalendarDate(h.startDate) }));
+}
+
+export async function listArchivedHabits(userId: string) {
+  const habits = await prisma.habit.findMany({
+    where: { userId, isArchived: true },
+    orderBy: { createdAt: 'desc' },
+    select: habitSelectFields,
+  });
+
+  return habits.map((h) => ({ ...h, startDate: formatCalendarDate(h.startDate) }));
 }
