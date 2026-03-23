@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { randomBytes, createHash } from 'node:crypto';
 import { prisma } from '../lib/prisma.js';
 import { config } from '../config.js';
 import { AppError } from '../middleware/error-handler.js';
 import { Prisma } from '../generated/prisma/client.js';
+import { sendPasswordResetEmail } from '../lib/email.js';
 
 const BCRYPT_ROUNDS = 12;
 const DUMMY_HASH = '$2b$12$LJ3m4ys3Lg9Xt0CUPOaM0eE9VIGbMPFsK/VGEJbXzI4DLz8MXhZm';
@@ -91,4 +93,45 @@ export async function changePassword(
   });
 
   return { success: true, message: 'Password changed successfully' };
+}
+
+const RESET_RESPONSE = {
+  success: true,
+  message: 'If an account exists for that email, check your inbox for reset instructions.',
+};
+
+export async function requestPasswordReset(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+    select: { id: true, email: true },
+  });
+
+  if (!user) {
+    return RESET_RESPONSE;
+  }
+
+  const rawToken = randomBytes(32).toString('hex');
+  const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  await prisma.passwordResetToken.deleteMany({
+    where: { userId: user.id, usedAt: null },
+  });
+
+  const tokenRow = await prisma.passwordResetToken.create({
+    data: { userId: user.id, tokenHash, expiresAt },
+  });
+
+  const resetUrl = `${config.CLIENT_URL}/reset-password/${rawToken}`;
+
+  try {
+    await sendPasswordResetEmail({ to: user.email, resetUrl });
+  } catch (err) {
+    console.error('Failed to send password reset email:', err);
+    await prisma.passwordResetToken.delete({ where: { id: tokenRow.id } });
+  }
+
+  return RESET_RESPONSE;
 }

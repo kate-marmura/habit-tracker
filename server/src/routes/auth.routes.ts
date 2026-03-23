@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { commonPasswords } from '../data/common-passwords.js';
-import { register, login, changePassword } from '../services/auth.service.js';
-import { registerLimiter, loginLimiter } from '../middleware/rate-limit.middleware.js';
+import { register, login, changePassword, requestPasswordReset } from '../services/auth.service.js';
+import { registerLimiter, loginLimiter, forgotPasswordLimiter } from '../middleware/rate-limit.middleware.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
 const passwordSchema = z
@@ -26,6 +26,10 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Invalid email format').max(255),
+});
+
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
   newPassword: passwordSchema,
@@ -42,6 +46,12 @@ router.post('/register', registerLimiter, async (req, res) => {
 router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
   const result = await login(email, password);
+  res.status(200).json(result);
+});
+
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
+  const { email } = forgotPasswordSchema.parse(req.body);
+  const result = await requestPasswordReset(email);
   res.status(200).json(result);
 });
 

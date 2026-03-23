@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 
 function HabitsPlaceholder() {
@@ -34,14 +35,6 @@ function HabitsPlaceholder() {
   );
 }
 
-function ForgotPasswordPlaceholder() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <p className="text-text-secondary">Forgot password — coming in E2-S5</p>
-    </div>
-  );
-}
-
 function RootRedirect() {
   const { isAuthenticated } = useAuth();
   return <Navigate to={isAuthenticated ? '/habits' : '/login'} replace />;
@@ -53,7 +46,7 @@ function App() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPlaceholder />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/habits" element={<HabitsPlaceholder />} />
     </Routes>
