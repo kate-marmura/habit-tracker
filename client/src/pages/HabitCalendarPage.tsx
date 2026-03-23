@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchHabitById, archiveHabit, unarchiveHabit } from '../services/habitsApi';
+import { fetchHabitById, archiveHabit, unarchiveHabit, fetchEntries } from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
@@ -20,6 +20,12 @@ export default function HabitCalendarPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const now = new Date();
+  const [calYear] = useState(now.getFullYear());
+  const [calMonth] = useState(now.getMonth() + 1);
+  const [entries, setEntries] = useState<Set<string>>(new Set());
+  const [entriesLoading, setEntriesLoading] = useState(false);
+  const [entriesError, setEntriesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -61,6 +67,37 @@ export default function HabitCalendarPage() {
     load();
     return () => { cancelled = true; };
   }, [isAuthenticated, id]);
+
+  useEffect(() => {
+    if (!habit || !id) return;
+
+    const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
+    let cancelled = false;
+
+    async function loadEntries() {
+      setEntriesLoading(true);
+      setEntriesError(null);
+      try {
+        const data = await fetchEntries(id!, monthStr);
+        if (!cancelled) {
+          setEntries(new Set(data.map((e) => e.entryDate)));
+        }
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError) {
+          if (err.code === 'REQUEST_ABORTED') return;
+          setEntriesError(err.message);
+        } else {
+          setEntriesError('Could not load entries. Please check your connection and try again.');
+        }
+      } finally {
+        if (!cancelled) setEntriesLoading(false);
+      }
+    }
+
+    loadEntries();
+    return () => { cancelled = true; };
+  }, [habit, id, calYear, calMonth]);
 
   function handleSaved(updated: Habit) {
     setHabit(updated);
@@ -146,16 +183,22 @@ export default function HabitCalendarPage() {
           </div>
         ) : (
           <div>
-            {habit && (() => {
-              const now = new Date();
-              return (
-                <CalendarGrid
-                  year={now.getFullYear()}
-                  month={now.getMonth() + 1}
-                  habitStartDate={habit.startDate}
-                />
-              );
-            })()}
+            {entriesLoading && (
+              <p className="text-text-secondary text-sm mb-2">Loading entries...</p>
+            )}
+            {entriesError && (
+              <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
+                {entriesError}
+              </div>
+            )}
+            {habit && (
+              <CalendarGrid
+                year={calYear}
+                month={calMonth}
+                habitStartDate={habit.startDate}
+                markedDates={entries}
+              />
+            )}
             {habit?.description && (
               <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
             )}

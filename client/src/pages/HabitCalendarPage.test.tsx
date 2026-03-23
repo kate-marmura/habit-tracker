@@ -33,6 +33,7 @@ vi.mock('../services/habitsApi', () => ({
   archiveHabit: vi.fn(),
   unarchiveHabit: vi.fn(),
   deleteHabit: vi.fn(),
+  fetchEntries: vi.fn().mockResolvedValue([]),
 }));
 
 function createMockToken(): string {
@@ -489,5 +490,34 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
     expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+  });
+
+  it('fetches entries on mount and displays marked dates', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValueOnce([
+      { id: 'e1', entryDate: '2026-03-05' },
+      { id: 'e2', entryDate: '2026-03-15' },
+    ]);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      const markedCells = cells.filter((c) => c.className.includes('bg-pink-500'));
+      expect(markedCells.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  it('shows loading entries text while fetching', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockReturnValueOnce(new Promise(() => {}));
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(await screen.findByText(/loading entries/i)).toBeInTheDocument();
   });
 });

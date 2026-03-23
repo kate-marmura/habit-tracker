@@ -18,3 +18,8 @@ export interface UpdateHabitPayload {
   name: string;
   description?: string;
 }
+
+export interface DayEntry {
+  id: string;
+  entryDate: string;
+}

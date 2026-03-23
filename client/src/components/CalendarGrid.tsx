@@ -8,6 +8,7 @@ import {
   isBefore,
   isAfter,
   startOfDay,
+  format,
 } from 'date-fns';
 import DayCell from './DayCell';
 
@@ -20,7 +21,7 @@ interface Props {
   markedDates?: Set<string>;
 }
 
-export default function CalendarGrid({ year, month, habitStartDate }: Props) {
+export default function CalendarGrid({ year, month, habitStartDate, markedDates }: Props) {
   const { days, leadingBlanks, startDate } = useMemo(() => {
     const monthDate = new Date(year, month - 1, 1);
     const start = startOfMonth(monthDate);
@@ -59,6 +60,7 @@ export default function CalendarGrid({ year, month, habitStartDate }: Props) {
             isToday={isTodayFn(day)}
             isBeforeStart={isBefore(day, startDate)}
             isFuture={isAfter(day, today)}
+            isMarked={markedDates?.has(format(day, 'yyyy-MM-dd'))}
           />
         ))}
       </div>

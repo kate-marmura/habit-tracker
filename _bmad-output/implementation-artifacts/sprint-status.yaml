@@ -77,7 +77,7 @@ development_status:
   # Epic 4: Calendar View & Day Marking
   epic-4: in-progress
   4-1-calendar-grid-component: done
-  4-2-fetch-and-display-day-entries: backlog
+  4-2-fetch-and-display-day-entries: done
   4-3-tap-to-mark-a-day-optimistic-ui: backlog
   4-4-tap-to-unmark-a-day-optimistic-ui: backlog
   4-5-month-navigation: backlog

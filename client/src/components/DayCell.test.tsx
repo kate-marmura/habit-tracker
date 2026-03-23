@@ -65,4 +65,38 @@ describe('DayCell', () => {
     expect(cell.className).toContain('min-h-[44px]');
     expect(cell.className).toContain('min-w-[44px]');
   });
+
+  it('applies marked styling', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    const cell = screen.getByRole('gridcell');
+    expect(cell.className).toContain('bg-pink-500');
+    expect(cell.className).toContain('text-white');
+    expect(cell.className).toContain('font-bold');
+  });
+
+  it('shows checkmark icon when marked', () => {
+    const { container } = render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    const svg = container.querySelector('svg');
+    expect(svg).not.toBeNull();
+  });
+
+  it('includes (marked) in aria-label when marked', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    expect(screen.getByRole('gridcell')).toHaveAttribute('aria-label', expect.stringContaining('(marked)'));
+  });
+
+  it('applies combined marked+today styling', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={true} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    const cell = screen.getByRole('gridcell');
+    expect(cell.className).toContain('bg-pink-500');
+    expect(cell.className).toContain('ring-pink-700');
+    expect(cell.className).toContain('text-white');
+  });
+
+  it('does not show marked state for inactive (before-start) days even if isMarked', () => {
+    render(<DayCell date={new Date(2026, 2, 1)} isToday={false} isBeforeStart={true} isFuture={false} isMarked={true} />);
+    const cell = screen.getByRole('gridcell');
+    expect(cell.className).toContain('bg-surface');
+    expect(cell.className).not.toContain('bg-pink-500');
+  });
 });

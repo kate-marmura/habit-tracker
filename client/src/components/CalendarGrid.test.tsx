@@ -76,4 +76,17 @@ describe('CalendarGrid', () => {
     expect(gridRows[0].className).toContain('grid-cols-7');
     expect(gridRows[1].className).toContain('grid-cols-7');
   });
+
+  it('passes markedDates to DayCell — marked days get pink-500 styling', () => {
+    const markedDates = new Set(['2026-03-05', '2026-03-15']);
+    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} />);
+
+    const cells = screen.getAllByRole('gridcell');
+    // Day 5 is index 4 (0-based), day 15 is index 14
+    expect(cells[4].className).toContain('bg-pink-500');
+    expect(cells[14].className).toContain('bg-pink-500');
+
+    // Day 6 (index 5) should NOT be marked
+    expect(cells[5].className).not.toContain('bg-pink-500');
+  });
 });
