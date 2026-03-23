@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      await post('/api/auth/reset-password', { token: token.trim(), newPassword });
+      await post('/api/auth/reset-password', { token: token!.trim(), newPassword });
       navigate('/login', { state: { message: 'Password reset successfully. Please log in.' } });
     } catch (err) {
       if (err instanceof ApiError) {
