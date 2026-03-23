@@ -12,6 +12,10 @@
     "lint:server": "npm run lint --prefix server",
     "format:client": "npm run format --prefix client",
     "format:server": "npm run format --prefix server",
+    "typecheck:client": "npx --prefix client tsc -b --noEmit",
+    "typecheck:server": "npx --prefix server tsc --noEmit",
+    "test:client": "npm test --prefix client --if-present",
+    "test:server": "npm test --prefix server --if-present",
     "test:e2e": "echo \"E2E tests not yet configured (E1-S6)\""
   }
 }

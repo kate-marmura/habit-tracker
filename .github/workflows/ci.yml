@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: habbit_tracker_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/habbit_tracker_test
+      JWT_SECRET: ci-test-secret-must-be-at-least-32-characters-long # Dummy value for CI only — satisfies zod min(32) validation
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            server/node_modules
+            client/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('server/package-lock.json', 'client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install server dependencies
+        run: npm ci
+        working-directory: server
+
+      - name: Install client dependencies
+        run: npm ci
+        working-directory: client
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: server
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+        working-directory: server
+
+      - name: Type-check server
+        run: npx tsc --noEmit
+        working-directory: server
+
+      - name: Type-check client
+        run: npx tsc -b --noEmit
+        working-directory: client
+
+      - name: Lint server
+        run: npm run lint
+        working-directory: server
+
+      - name: Lint client
+        run: npm run lint
+        working-directory: client
+
+      # Test frameworks configured in E1-S6
+      - name: Test server
+        run: npm test --if-present
+        working-directory: server
+
+      - name: Test client
+        run: npm test --if-present
+        working-directory: client
