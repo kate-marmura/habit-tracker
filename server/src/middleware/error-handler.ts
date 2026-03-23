@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { Prisma } from '../generated/prisma/client.js';
 import { config } from '../config.js';
 
 export class AppError extends Error {
@@ -15,6 +16,10 @@ export class AppError extends Error {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Express requires 4 params for error middleware
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
+  if (res.headersSent) {
+    return;
+  }
+
   if (config.NODE_ENV === 'development') {
     console.error(err.stack);
   } else {
@@ -36,16 +41,14 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  // Prisma known request errors
-  if (err.name === 'PrismaClientKnownRequestError') {
-    const prismaErr = err as Error & { code: string };
-    if (prismaErr.code === 'P2002') {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === 'P2002') {
       res.status(409).json({
         error: { code: 'CONFLICT', message: 'A record with this value already exists' },
       });
       return;
     }
-    if (prismaErr.code === 'P2025') {
+    if (err.code === 'P2025') {
       res.status(404).json({
         error: { code: 'NOT_FOUND', message: 'Record not found' },
       });

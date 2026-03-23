@@ -7,13 +7,27 @@ declare module 'express' {
   }
 }
 
-export function timezoneMiddleware(req: Request, res: Response, next: NextFunction): void {
-  const timezone = req.get('X-Timezone') ?? 'UTC';
+function isValidTimezone(tz: string): boolean {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
-  if (!req.get('X-Timezone') && config.NODE_ENV === 'development') {
-    console.warn(`Missing X-Timezone header for ${req.method} ${req.path}, defaulting to UTC`);
+export function timezoneMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const header = req.get('X-Timezone');
+
+  if (!header) {
+    if (config.NODE_ENV === 'development') {
+      console.warn(`Missing X-Timezone header for ${req.method} ${req.path}, defaulting to UTC`);
+    }
+    res.locals.timezone = 'UTC';
+    next();
+    return;
   }
 
-  res.locals.timezone = timezone;
+  res.locals.timezone = isValidTimezone(header) ? header : 'UTC';
   next();
 }
