@@ -11,6 +11,7 @@ import {
   unarchiveHabit,
   deleteHabit,
 } from '../services/habit.service.js';
+import { getHabitStats } from '../services/stats.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
 export const createHabitSchema = z.object({
@@ -47,6 +48,12 @@ router.post('/', async (req, res) => {
   const input = createHabitSchema.parse(req.body);
   const habit = await createHabit(res.locals.userId, input, res.locals.timezone);
   res.status(201).json(habit);
+});
+
+router.get('/:id/stats', async (req, res) => {
+  const id = habitIdParam.parse(req.params.id);
+  const stats = await getHabitStats(res.locals.userId, id, res.locals.timezone);
+  res.json(stats);
 });
 
 router.get('/:id', async (req, res) => {

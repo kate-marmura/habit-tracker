@@ -1,5 +1,5 @@
 # generated: 2026-03-20
-# last_updated: 2026-03-25T12:00:00
+# last_updated: 2026-03-25T14:00:00
 # project: habit-tracker
 # project_key: NOKEY
 # tracking_system: file-system
@@ -87,8 +87,8 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Progress & Statistics
-  epic-5: backlog
-  5-1-statistics-calculation-api: backlog
+  epic-5: in-progress
+  5-1-statistics-calculation-api: done
   5-2-stats-panel-ui-component: backlog
   5-3-real-time-stats-update-on-mark-unmark: backlog
   epic-5-retrospective: optional
