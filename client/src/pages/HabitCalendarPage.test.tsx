@@ -227,6 +227,32 @@ describe('HabitCalendarPage', () => {
     expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute('href', '/habits/archived');
   });
 
+  it('uses responsive two-column grid layout on desktop', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    const { container } = renderPage();
+    await screen.findByText('Exercise');
+
+    const gridContainer = container.querySelector('.md\\:grid.md\\:grid-cols-3');
+    expect(gridContainer).toBeInTheDocument();
+    expect(gridContainer?.querySelector('.md\\:col-span-2')).toBeInTheDocument();
+    expect(gridContainer?.querySelector('.md\\:col-span-1')).toBeInTheDocument();
+  });
+
+  it('uses wider max-w-4xl on desktop for header and main', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    const { container } = renderPage();
+    await screen.findByText('Exercise');
+
+    const headerInner = container.querySelector('header .md\\:max-w-4xl');
+    expect(headerInner).toBeInTheDocument();
+    const main = container.querySelector('main.md\\:max-w-4xl');
+    expect(main).toBeInTheDocument();
+  });
+
   it('shows settings dropdown with edit option', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);

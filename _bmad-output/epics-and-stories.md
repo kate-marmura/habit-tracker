@@ -16,7 +16,7 @@
 | E4 | Calendar View & Day Marking | 8 | P0 | Calendar grid, tap-to-mark, month navigation, optimistic UI, UI polish |
 | E5 | Progress & Statistics | 3 | P1 | Streak calculation, completion rate, stats panel |
 | E6 | AI Coaching | 4 | Phase 2 | LLM integration, help-me button, graceful degradation (deferred from MVP) |
-| E7 | App Shell & Navigation | 4 | P0 | Layouts, routing, protected routes, responsive nav |
+| E7 | App Shell & Navigation | 6 | P0 | Layouts, routing, protected routes, responsive nav, desktop layout, UI polish |
 
 ### Dependency Graph
 
@@ -851,7 +851,46 @@ The following QA practices apply to every feature story, not just this setup sto
 
 ---
 
-### E7-S3: Client-Side Routing Setup
+### E7-S3: Calendar Page Desktop Two-Column Layout
+
+**As a** user,
+**I want** to see the calendar, statistics, description, and start date all at once on desktop without scrolling,
+**so that** I get a complete view of my habit's progress at a glance.
+
+**Acceptance Criteria:**
+
+- [ ] On desktop (≥ 768px), HabitCalendarPage displays two columns: calendar (2/3 width) and sidebar (1/3 width)
+- [ ] Left column contains MonthNavigator and CalendarGrid
+- [ ] Right column contains StatsPanel, description, and start date
+- [ ] Mobile layout (< 768px) remains single-column stacked as before
+- [ ] Main content container widens to `max-w-4xl` on desktop (stays `max-w-2xl` on mobile)
+- [ ] StatsPanel cards stack vertically in the sidebar
+- [ ] Calendar day cells remain comfortably sized for interaction
+
+**Refs:** Architecture §6 (Component Hierarchy), PRD FR21-23
+
+---
+
+### E7-S4: UI Consistency Polish
+
+**As a** user,
+**I want** a visually consistent, polished UI across the app,
+**so that** the design feels cohesive and professional.
+
+**Acceptance Criteria:**
+
+- [ ] NavBar and all page content containers use the same responsive max-width (`max-w-2xl md:max-w-4xl`)
+- [ ] Logo link has no hover highlight (no background change on hover/focus)
+- [ ] Inactive nav buttons (Archived, Settings, Log out) change text color to pink on hover instead of grey background
+- [ ] "Started {date}" text moves from calendar page sidebar to the page sub-header (under habit title)
+- [ ] Habit description removed from HabitCalendarPage entirely
+- [ ] Delete button on HabitCard uses pink hover color (`hover:text-pink-500`) instead of red
+
+**Refs:** Design consistency, Screenshot feedback
+
+---
+
+### E7-S5: Client-Side Routing Setup
 
 **As a** developer,
 **I want** React Router v7 configured with all application routes,
@@ -869,7 +908,7 @@ The following QA practices apply to every feature story, not just this setup sto
 
 ---
 
-### E7-S4: API Client & Auth Interceptor
+### E7-S6: API Client & Auth Interceptor
 
 **As a** developer,
 **I want** a centralized API client that attaches JWT tokens and handles common errors,
@@ -937,8 +976,10 @@ The following QA practices apply to every feature story, not just this setup sto
 | E6-S4 | S (Phase 2) |
 | E7-S1 | L |
 | E7-S2 | M |
-| E7-S3 | M |
-| E7-S4 | M |
+| E7-S3 | S |
+| E7-S4 | S |
+| E7-S5 | M |
+| E7-S6 | M |
 
 ---
 
@@ -956,14 +997,16 @@ The following QA practices apply to every feature story, not just this setup sto
 - E2-S2: User Login
 - E2-S3: User Logout
 - E7-S1: Auth Layout & Protected Routes
-- E7-S3: Client-Side Routing Setup
-- E7-S4: API Client & Auth Interceptor
+- E7-S5: Client-Side Routing Setup
+- E7-S6: API Client & Auth Interceptor
 
 ### Sprint 3: Habits & Navigation
 - E3-S1: Create a Habit
 - E3-S2: View Active and Archived Habit Lists
 - E3-S3: Edit a Habit
 - E7-S2: Responsive Navigation Bar
+- E7-S3: Calendar Page Desktop Two-Column Layout
+- E7-S4: UI Consistency Polish
 
 ### Sprint 4: Calendar (Core Experience)
 - E4-S1: Calendar Grid Component

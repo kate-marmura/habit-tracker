@@ -18,11 +18,11 @@ export default function StatsPanel({ stats, isLoading }: Props) {
 
   return (
     <section
-      className="bg-surface rounded-lg border border-border p-4 mt-4"
+      className="bg-surface rounded-lg border border-border p-4"
       aria-label="Habit statistics"
     >
-      <div className="flex flex-wrap gap-4 justify-stretch">
-        <div className="flex-1 min-w-[140px] text-center bg-background rounded-lg p-3">
+      <div className="flex flex-col sm:flex-row md:flex-col gap-4 justify-stretch">
+        <div className="flex-1 sm:min-w-[140px] md:min-w-0 text-center bg-background rounded-lg p-3">
           <p className="text-xs text-muted uppercase tracking-wide mb-1">Current Streak</p>
           <p
             className={`text-2xl font-bold text-pink-500 ${showPlaceholder ? 'animate-pulse text-muted' : ''}`}
@@ -30,7 +30,7 @@ export default function StatsPanel({ stats, isLoading }: Props) {
             {showPlaceholder ? '—' : streakDisplay(stats.currentStreak)}
           </p>
         </div>
-        <div className="flex-1 min-w-[140px] text-center bg-background rounded-lg p-3">
+        <div className="flex-1 sm:min-w-[140px] md:min-w-0 text-center bg-background rounded-lg p-3">
           <p className="text-xs text-muted uppercase tracking-wide mb-1">Longest Streak</p>
           <p
             className={`text-2xl font-bold text-pink-500 ${showPlaceholder ? 'animate-pulse text-muted' : ''}`}
@@ -38,7 +38,7 @@ export default function StatsPanel({ stats, isLoading }: Props) {
             {showPlaceholder ? '—' : streakDisplay(stats.longestStreak)}
           </p>
         </div>
-        <div className="flex-1 min-w-[140px] text-center bg-background rounded-lg p-3">
+        <div className="flex-1 sm:min-w-[140px] md:min-w-0 text-center bg-background rounded-lg p-3">
           <p className="text-xs text-muted uppercase tracking-wide mb-1">Completion Rate</p>
           <p
             className={`text-2xl font-bold text-pink-500 ${showPlaceholder ? 'animate-pulse text-muted' : ''}`}

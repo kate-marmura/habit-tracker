@@ -306,7 +306,7 @@ export default function HabitCalendarPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-2xl md:max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <h1 className="text-xl font-bold text-pink-500 truncate">
               {loading ? 'Loading...' : habit?.name ?? 'Habit'}
@@ -343,7 +343,7 @@ export default function HabitCalendarPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl md:max-w-4xl mx-auto px-4 py-8">
         {loading ? (
           <div className="text-center py-16">
             <p className="text-text-secondary">Loading habit...</p>
@@ -359,44 +359,48 @@ export default function HabitCalendarPage() {
             </Link>
           </div>
         ) : (
-          <div>
-            {entriesQuery.isLoading && (
-              <p className="text-text-secondary text-sm mb-2">Loading entries...</p>
-            )}
-            {entriesQuery.isError && (
-              <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
-                {entriesQuery.error instanceof Error ? entriesQuery.error.message : 'Could not load entries.'}
-              </div>
-            )}
-            {habit && (
-              <MonthNavigator
-                year={calYear}
-                month={calMonth}
-                onPrev={goToPrevMonth}
-                onNext={goToNextMonth}
-                canGoPrev={canGoPrev}
-                canGoNext={!isCurrentMonth}
-              />
-            )}
-            {habit && (
-              <CalendarGrid
-                year={calYear}
-                month={calMonth}
-                habitStartDate={habit.startDate}
-                markedDates={markedDates}
-                pendingDates={pendingDates}
-                onDayClick={!habit.isArchived ? handleDayClick : undefined}
-              />
-            )}
-            {!statsQuery.isError && habit && (
-              <StatsPanel stats={statsQuery.data} isLoading={statsQuery.isLoading} />
-            )}
-            {habit?.description && (
-              <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
-            )}
-            <p className="text-xs text-muted mt-2">
-              Started {habit ? formatDate(habit.startDate) : ''}
-            </p>
+          <div className="md:grid md:grid-cols-3 md:gap-8">
+            <div className="md:col-span-2">
+              {entriesQuery.isLoading && (
+                <p className="text-text-secondary text-sm mb-2">Loading entries...</p>
+              )}
+              {entriesQuery.isError && (
+                <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
+                  {entriesQuery.error instanceof Error ? entriesQuery.error.message : 'Could not load entries.'}
+                </div>
+              )}
+              {habit && (
+                <MonthNavigator
+                  year={calYear}
+                  month={calMonth}
+                  onPrev={goToPrevMonth}
+                  onNext={goToNextMonth}
+                  canGoPrev={canGoPrev}
+                  canGoNext={!isCurrentMonth}
+                />
+              )}
+              {habit && (
+                <CalendarGrid
+                  year={calYear}
+                  month={calMonth}
+                  habitStartDate={habit.startDate}
+                  markedDates={markedDates}
+                  pendingDates={pendingDates}
+                  onDayClick={!habit.isArchived ? handleDayClick : undefined}
+                />
+              )}
+            </div>
+            <div className="md:col-span-1 mt-4 md:mt-0">
+              {!statsQuery.isError && habit && (
+                <StatsPanel stats={statsQuery.data} isLoading={statsQuery.isLoading} />
+              )}
+              {habit?.description && (
+                <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
+              )}
+              <p className="text-xs text-muted mt-2">
+                Started {habit ? formatDate(habit.startDate) : ''}
+              </p>
+            </div>
           </div>
         )}
       </main>
