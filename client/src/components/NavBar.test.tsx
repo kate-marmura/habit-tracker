@@ -73,8 +73,19 @@ describe('NavBar', () => {
 
   it('does not highlight Archived or Settings on /habits', () => {
     renderNavBar('/habits');
-    expect(screen.getByRole('link', { name: /archived/i }).className).not.toContain('text-pink-500');
-    expect(screen.getByRole('link', { name: /settings/i }).className).not.toContain('text-pink-500');
+    expect(screen.getByRole('link', { name: /archived/i }).className).not.toContain('bg-pink-50');
+    expect(screen.getByRole('link', { name: /settings/i }).className).not.toContain('bg-pink-50');
+  });
+
+  it('uses pink text for inactive nav hover and focus states', () => {
+    renderNavBar('/habits');
+    expect(screen.getByRole('link', { name: /archived/i }).className).toContain('hover:text-pink-500');
+    expect(screen.getByRole('link', { name: /archived/i }).className).toContain(
+      'focus-visible:text-pink-500',
+    );
+    expect(screen.getByRole('button', { name: /log out/i }).className).toContain(
+      'focus-visible:text-pink-500',
+    );
   });
 
   it('calls logout on Log out click', async () => {

@@ -157,8 +157,8 @@ describe('HabitCalendarPage', () => {
     renderPage();
 
     expect(await screen.findByText('Exercise')).toBeInTheDocument();
-    expect(screen.getByText('Daily workout')).toBeInTheDocument();
     expect(screen.getByText(/started 1 january 2026/i)).toBeInTheDocument();
+    expect(screen.queryByText('Daily workout')).not.toBeInTheDocument();
   });
 
   it('renders StatsPanel with stats from fetchHabitStats below the calendar', async () => {

@@ -70,7 +70,7 @@ export default function HabitListPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl md:max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-text">Your Habits</h2>
           <button

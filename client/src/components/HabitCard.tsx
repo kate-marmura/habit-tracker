@@ -53,7 +53,7 @@ export default function HabitCard({ habit, onEdit, onArchive, onDelete }: Props)
         <button
           type="button"
           onClick={() => onDelete(habit)}
-          className="p-1.5 rounded text-text-secondary hover:text-red-500 transition"
+          className="p-1.5 rounded text-text-secondary hover:text-pink-500 transition"
           aria-label={`Delete ${habit.name}`}
         >
           <Trash2 size={18} />

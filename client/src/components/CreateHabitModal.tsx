@@ -84,7 +84,7 @@ export default function CreateHabitModal({ onClose, onCreated }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-surface rounded-xl shadow-lg border border-border p-8 w-full max-w-md"
+        className="bg-surface rounded-xl shadow-lg border border-border p-8 w-full max-w-md max-h-[min(calc(100vh-2rem),calc(100dvh-2rem))] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-habit-title"

@@ -307,14 +307,19 @@ export default function HabitCalendarPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
         <div className="max-w-2xl md:max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-xl font-bold text-pink-500 truncate">
-              {loading ? 'Loading...' : habit?.name ?? 'Habit'}
-            </h1>
-            {habit?.isArchived && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-muted shrink-0">
-                Archived
-              </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="min-w-0 text-xl font-bold text-pink-500 truncate">
+                {loading ? 'Loading...' : habit?.name ?? 'Habit'}
+              </h1>
+              {habit?.isArchived && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-muted shrink-0">
+                  Archived
+                </span>
+              )}
+            </div>
+            {habit && (
+              <p className="text-xs text-muted">Started {formatDate(habit.startDate)}</p>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -394,12 +399,6 @@ export default function HabitCalendarPage() {
               {!statsQuery.isError && habit && (
                 <StatsPanel stats={statsQuery.data} isLoading={statsQuery.isLoading} />
               )}
-              {habit?.description && (
-                <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
-              )}
-              <p className="text-xs text-muted mt-2">
-                Started {habit ? formatDate(habit.startDate) : ''}
-              </p>
             </div>
           </div>
         )}

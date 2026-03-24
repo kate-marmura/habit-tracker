@@ -105,8 +105,8 @@ development_status:
   epic-7: in-progress
   7-1-auth-layout-protected-routes: done
   7-2-responsive-navigation-bar: done
-  7-3-calendar-page-desktop-two-column-layout: review
-  7-4-ui-consistency-polish: ready-for-dev
+  7-3-calendar-page-desktop-two-column-layout: done
+  7-4-ui-consistency-polish: done
   7-5-client-side-routing-setup: backlog
   7-6-api-client-auth-interceptor: backlog
   epic-7-retrospective: optional

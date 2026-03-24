@@ -169,7 +169,7 @@ export default function DatePicker({
         </div>
         <div className="grid grid-cols-7 gap-1" role="row">
           {Array.from({ length: leadingBlanks }, (_, i) => (
-            <div key={`b-${i}`} className="min-h-[44px] min-w-[44px]" />
+            <div key={`b-${i}`} className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px]" />
           ))}
           {days.map((day) => {
             const ymd = format(day, 'yyyy-MM-dd');
@@ -179,7 +179,7 @@ export default function DatePicker({
             const focused = isSameDay(day, focusDate);
 
             let cell =
-              'min-h-[44px] min-w-[44px] aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-150 ';
+              'min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-150 ';
             if (disabled) {
               cell += 'bg-surface text-muted cursor-default';
             } else if (selected) {
