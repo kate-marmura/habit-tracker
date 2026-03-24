@@ -1,4 +1,4 @@
-import { get, put, patch, del } from './api';
+import { get, post, put, patch, del } from './api';
 import type { Habit, UpdateHabitPayload, DayEntry } from '../types/habit';
 
 export function fetchActiveHabits(): Promise<Habit[]> {
@@ -31,4 +31,8 @@ export function deleteHabit(id: string): Promise<{ deleted: boolean }> {
 
 export function fetchEntries(habitId: string, month: string): Promise<DayEntry[]> {
   return get<DayEntry[]>(`/api/habits/${habitId}/entries?month=${month}`);
+}
+
+export function createEntry(habitId: string, date: string): Promise<DayEntry> {
+  return post<DayEntry>(`/api/habits/${habitId}/entries`, { date });
 }

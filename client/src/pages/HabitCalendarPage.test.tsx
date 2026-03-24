@@ -34,6 +34,7 @@ vi.mock('../services/habitsApi', () => ({
   unarchiveHabit: vi.fn(),
   deleteHabit: vi.fn(),
   fetchEntries: vi.fn().mockResolvedValue([]),
+  createEntry: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -519,5 +520,55 @@ describe('HabitCalendarPage', () => {
     await screen.findByText('Exercise');
 
     expect(await screen.findByText(/loading entries/i)).toBeInTheDocument();
+  });
+
+  it('optimistically marks a day when clicked', async () => {
+    const { fetchHabitById, fetchEntries, createEntry } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries)
+      .mockResolvedValueOnce([])
+      .mockResolvedValue([{ id: 'e-new', entryDate: '2026-03-10' }]);
+    vi.mocked(createEntry).mockResolvedValueOnce({ id: 'e-new', entryDate: '2026-03-10' });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      expect(screen.getAllByRole('gridcell').length).toBeGreaterThan(0);
+    });
+
+    const cells = screen.getAllByRole('gridcell');
+    await user.click(cells[9]);
+
+    await vi.waitFor(() => {
+      const updatedCells = screen.getAllByRole('gridcell');
+      expect(updatedCells[9].className).toContain('bg-pink-500');
+    });
+
+    expect(vi.mocked(createEntry)).toHaveBeenCalledWith(
+      'abc-123',
+      '2026-03-10',
+    );
+  });
+
+  it('shows error toast when mark mutation fails', async () => {
+    const { fetchHabitById, fetchEntries, createEntry } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+    vi.mocked(createEntry).mockRejectedValueOnce(new Error('Network error'));
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      expect(screen.getAllByRole('gridcell').length).toBeGreaterThan(0);
+    });
+
+    const cells = screen.getAllByRole('gridcell');
+    await user.click(cells[9]);
+
+    expect(await screen.findByText(/network error/i)).toBeInTheDocument();
   });
 });

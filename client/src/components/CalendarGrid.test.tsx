@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import CalendarGrid from './CalendarGrid';
 
 describe('CalendarGrid', () => {
@@ -82,11 +83,38 @@ describe('CalendarGrid', () => {
     render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} />);
 
     const cells = screen.getAllByRole('gridcell');
-    // Day 5 is index 4 (0-based), day 15 is index 14
     expect(cells[4].className).toContain('bg-pink-500');
     expect(cells[14].className).toContain('bg-pink-500');
-
-    // Day 6 (index 5) should NOT be marked
     expect(cells[5].className).not.toContain('bg-pink-500');
+  });
+
+  it('fires onDayClick with correct date string for eligible unmarked day', async () => {
+    const onDayClick = vi.fn();
+    const user = userEvent.setup();
+    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" onDayClick={onDayClick} />);
+
+    const cells = screen.getAllByRole('gridcell');
+    // Day 10 is index 9 (0-based)
+    await user.click(cells[9]);
+    expect(onDayClick).toHaveBeenCalledWith('2026-03-10');
+  });
+
+  it('does not fire onDayClick for already-marked days', async () => {
+    const onDayClick = vi.fn();
+    const markedDates = new Set(['2026-03-10']);
+    const user = userEvent.setup();
+    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} onDayClick={onDayClick} />);
+
+    const cells = screen.getAllByRole('gridcell');
+    await user.click(cells[9]);
+    expect(onDayClick).not.toHaveBeenCalled();
+  });
+
+  it('passes pendingDates — mutating cells have opacity-60', () => {
+    const pendingDates = new Set(['2026-03-10']);
+    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" pendingDates={pendingDates} />);
+
+    const cells = screen.getAllByRole('gridcell');
+    expect(cells[9].className).toContain('opacity-60');
   });
 });

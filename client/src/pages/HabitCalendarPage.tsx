@@ -1,17 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchHabitById, archiveHabit, unarchiveHabit, fetchEntries } from '../services/habitsApi';
+import { fetchHabitById, archiveHabit, unarchiveHabit, fetchEntries, createEntry } from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
 import ConfirmModal from '../components/ConfirmModal';
 import CalendarGrid from '../components/CalendarGrid';
+import ErrorToast from '../components/ErrorToast';
 import type { Habit } from '../types/habit';
 
 export default function HabitCalendarPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
   const { id } = useParams<{ id: string }>();
   const [habit, setHabit] = useState<Habit | null>(null);
@@ -20,12 +23,14 @@ export default function HabitCalendarPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [pendingDates, setPendingDates] = useState<Set<string>>(new Set());
+
   const now = new Date();
   const [calYear] = useState(now.getFullYear());
   const [calMonth] = useState(now.getMonth() + 1);
-  const [entries, setEntries] = useState<Set<string>>(new Set());
-  const [entriesLoading, setEntriesLoading] = useState(false);
-  const [entriesError, setEntriesError] = useState<string | null>(null);
+  const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
+  const entriesQueryKey = ['entries', id, monthStr];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -68,36 +73,57 @@ export default function HabitCalendarPage() {
     return () => { cancelled = true; };
   }, [isAuthenticated, id]);
 
-  useEffect(() => {
-    if (!habit || !id) return;
+  const entriesQuery = useQuery({
+    queryKey: entriesQueryKey,
+    queryFn: async () => {
+      const data = await fetchEntries(id!, monthStr);
+      return new Set(data.map((e) => e.entryDate));
+    },
+    enabled: !!habit && !!id,
+  });
 
-    const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
-    let cancelled = false;
+  const markMutation = useMutation({
+    mutationFn: (dateStr: string) => createEntry(id!, dateStr),
+    onMutate: async (dateStr) => {
+      await queryClient.cancelQueries({ queryKey: entriesQueryKey });
+      queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => new Set([...(old ?? []), dateStr]));
+      setPendingDates((prev) => new Set([...prev, dateStr]));
+    },
+    onError: (_err, dateStr) => {
+      queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => {
+        const next = new Set(old ?? []);
+        next.delete(dateStr);
+        return next;
+      });
+      setPendingDates((prev) => {
+        const next = new Set(prev);
+        next.delete(dateStr);
+        return next;
+      });
+      const msg = _err instanceof Error ? _err.message : 'Could not mark day. Please try again.';
+      setToastMessage(msg);
+    },
+    onSuccess: (_data, dateStr) => {
+      setPendingDates((prev) => {
+        const next = new Set(prev);
+        next.delete(dateStr);
+        return next;
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: entriesQueryKey });
+    },
+  });
 
-    async function loadEntries() {
-      setEntriesLoading(true);
-      setEntriesError(null);
-      try {
-        const data = await fetchEntries(id!, monthStr);
-        if (!cancelled) {
-          setEntries(new Set(data.map((e) => e.entryDate)));
-        }
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof ApiError) {
-          if (err.code === 'REQUEST_ABORTED') return;
-          setEntriesError(err.message);
-        } else {
-          setEntriesError('Could not load entries. Please check your connection and try again.');
-        }
-      } finally {
-        if (!cancelled) setEntriesLoading(false);
-      }
-    }
+  const dismissToast = useCallback(() => setToastMessage(null), []);
 
-    loadEntries();
-    return () => { cancelled = true; };
-  }, [habit, id, calYear, calMonth]);
+  const handleMarkDay = useCallback(
+    (dateStr: string) => {
+      if (entriesQuery.data?.has(dateStr) || pendingDates.has(dateStr)) return;
+      markMutation.mutate(dateStr);
+    },
+    [entriesQuery.data, pendingDates, markMutation],
+  );
 
   function handleSaved(updated: Habit) {
     setHabit(updated);
@@ -127,6 +153,8 @@ export default function HabitCalendarPage() {
   }
 
   if (!isAuthenticated) return null;
+
+  const markedDates = entriesQuery.data ?? new Set<string>();
 
   return (
     <div className="min-h-screen bg-background">
@@ -183,12 +211,12 @@ export default function HabitCalendarPage() {
           </div>
         ) : (
           <div>
-            {entriesLoading && (
+            {entriesQuery.isLoading && (
               <p className="text-text-secondary text-sm mb-2">Loading entries...</p>
             )}
-            {entriesError && (
+            {entriesQuery.isError && (
               <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
-                {entriesError}
+                {entriesQuery.error instanceof Error ? entriesQuery.error.message : 'Could not load entries.'}
               </div>
             )}
             {habit && (
@@ -196,7 +224,9 @@ export default function HabitCalendarPage() {
                 year={calYear}
                 month={calMonth}
                 habitStartDate={habit.startDate}
-                markedDates={entries}
+                markedDates={markedDates}
+                pendingDates={pendingDates}
+                onDayClick={!habit.isArchived ? handleMarkDay : undefined}
               />
             )}
             {habit?.description && (
@@ -233,6 +263,8 @@ export default function HabitCalendarPage() {
           onCancel={() => setShowArchiveModal(false)}
         />
       )}
+
+      <ErrorToast message={toastMessage} onDismiss={dismissToast} />
     </div>
   );
 }

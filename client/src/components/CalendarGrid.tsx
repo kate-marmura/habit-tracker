@@ -19,9 +19,11 @@ interface Props {
   month: number;
   habitStartDate: string;
   markedDates?: Set<string>;
+  pendingDates?: Set<string>;
+  onDayClick?: (dateStr: string) => void;
 }
 
-export default function CalendarGrid({ year, month, habitStartDate, markedDates }: Props) {
+export default function CalendarGrid({ year, month, habitStartDate, markedDates, pendingDates, onDayClick }: Props) {
   const { days, leadingBlanks, startDate } = useMemo(() => {
     const monthDate = new Date(year, month - 1, 1);
     const start = startOfMonth(monthDate);
@@ -53,16 +55,23 @@ export default function CalendarGrid({ year, month, habitStartDate, markedDates 
         {Array.from({ length: leadingBlanks }, (_, i) => (
           <div key={`blank-${i}`} className="min-h-[44px] min-w-[44px] aspect-square" />
         ))}
-        {days.map((day) => (
-          <DayCell
-            key={day.toISOString()}
-            date={day}
-            isToday={isTodayFn(day)}
-            isBeforeStart={isBefore(day, startDate)}
-            isFuture={isAfter(day, today)}
-            isMarked={markedDates?.has(format(day, 'yyyy-MM-dd'))}
-          />
-        ))}
+        {days.map((day) => {
+          const dateStr = format(day, 'yyyy-MM-dd');
+          const isMarked = markedDates?.has(dateStr);
+          const dayIsInactive = isBefore(day, startDate) || isAfter(day, today);
+          return (
+            <DayCell
+              key={day.toISOString()}
+              date={day}
+              isToday={isTodayFn(day)}
+              isBeforeStart={isBefore(day, startDate)}
+              isFuture={isAfter(day, today)}
+              isMarked={isMarked}
+              isMutating={pendingDates?.has(dateStr)}
+              onClick={!dayIsInactive && !isMarked && onDayClick ? () => onDayClick(dateStr) : undefined}
+            />
+          );
+        })}
       </div>
     </div>
   );

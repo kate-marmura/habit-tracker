@@ -99,4 +99,26 @@ describe('DayCell', () => {
     expect(cell.className).toContain('bg-surface');
     expect(cell.className).not.toContain('bg-pink-500');
   });
+
+  it('applies isMutating styling (opacity and pointer-events-none)', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMutating={true} />);
+    const cell = screen.getByRole('gridcell');
+    expect(cell.className).toContain('opacity-60');
+    expect(cell.className).toContain('pointer-events-none');
+  });
+
+  it('does not fire onClick when isMutating', async () => {
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMutating={true} onClick={onClick} />);
+    await user.click(screen.getByRole('gridcell'));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('has transition classes for animation', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} />);
+    const cell = screen.getByRole('gridcell');
+    expect(cell.className).toContain('transition-all');
+    expect(cell.className).toContain('duration-150');
+  });
 });
