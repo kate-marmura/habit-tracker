@@ -176,6 +176,7 @@ export default function HabitCalendarPage() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: entriesQueryKey });
+      queryClient.invalidateQueries({ queryKey: statsQueryKey });
     },
   });
 
@@ -186,6 +187,7 @@ export default function HabitCalendarPage() {
       try {
         await deleteEntry(id!, dateStr);
         queryClient.invalidateQueries({ queryKey: entriesQueryKey });
+        queryClient.invalidateQueries({ queryKey: statsQueryKey });
       } catch (err) {
         queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => new Set([...(old ?? []), dateStr]));
         const msg = err instanceof Error ? err.message : 'Could not unmark day. Please try again.';
@@ -198,7 +200,7 @@ export default function HabitCalendarPage() {
         });
       }
     },
-    [id, queryClient, entriesQueryKey],
+    [id, queryClient, entriesQueryKey, statsQueryKey],
   );
 
   const commitPendingUndo = useCallback(() => {

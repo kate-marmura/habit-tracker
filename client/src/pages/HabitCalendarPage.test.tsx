@@ -909,4 +909,82 @@ describe('HabitCalendarPage', () => {
     expect(await screen.findByText('Meditate')).toBeInTheDocument();
     expect(screen.queryByText('Exercise')).not.toBeInTheDocument();
   });
+
+  it('marking a day triggers a stats refetch', async () => {
+    const { fetchHabitById, fetchEntries, createEntry, fetchHabitStats } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries)
+      .mockResolvedValueOnce([])
+      .mockResolvedValue([{ id: 'e-new', entryDate: '2026-03-10' }]);
+    vi.mocked(createEntry).mockResolvedValueOnce({ id: 'e-new', entryDate: '2026-03-10' });
+
+    const statsMock = vi.mocked(fetchHabitStats);
+    statsMock.mockClear();
+    statsMock.mockResolvedValue({
+      currentStreak: 1,
+      longestStreak: 1,
+      completionRate: 0.01,
+      totalDays: 100,
+      completedDays: 1,
+    });
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      expect(screen.getAllByRole('gridcell').length).toBeGreaterThan(0);
+    });
+
+    statsMock.mockClear();
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+
+    await vi.waitFor(() => {
+      expect(statsMock).toHaveBeenCalled();
+    });
+  });
+
+  it('unmarking a day (after undo expires) triggers a stats refetch', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries, deleteEntry, fetchHabitStats } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+    vi.mocked(deleteEntry).mockResolvedValue(undefined);
+
+    const statsMock = vi.mocked(fetchHabitStats);
+    statsMock.mockResolvedValue({
+      currentStreak: 0,
+      longestStreak: 0,
+      completionRate: 0,
+      totalDays: 100,
+      completedDays: 0,
+    });
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-marked');
+    });
+
+    statsMock.mockClear();
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    await screen.findByText('Day unmarked');
+
+    await vi.advanceTimersByTimeAsync(3000);
+
+    await vi.waitFor(() => {
+      expect(vi.mocked(deleteEntry)).toHaveBeenCalledWith('abc-123', '2026-03-10');
+    });
+
+    await vi.waitFor(() => {
+      expect(statsMock).toHaveBeenCalled();
+    });
+
+    vi.useRealTimers();
+  });
 });
