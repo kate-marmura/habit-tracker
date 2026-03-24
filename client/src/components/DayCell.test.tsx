@@ -138,4 +138,37 @@ describe('DayCell', () => {
     render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
     expect(screen.getByRole('gridcell').className).not.toContain('cursor-pointer');
   });
+
+  it('applies hover:bg-pink-600 to marked cell when onClick is present', () => {
+    const onClick = vi.fn();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} onClick={onClick} />);
+    expect(screen.getByRole('gridcell').className).toContain('hover:bg-pink-600');
+  });
+
+  it('does not apply hover:bg-pink-600 to marked cell without onClick', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    expect(screen.getByRole('gridcell').className).not.toContain('hover:bg-pink-600');
+  });
+
+  it('applies hover:bg-pink-100 to today unmarked cell when onClick is present', () => {
+    const onClick = vi.fn();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={true} isBeforeStart={false} isFuture={false} onClick={onClick} />);
+    expect(screen.getByRole('gridcell').className).toContain('hover:bg-pink-100');
+  });
+
+  it('does not apply hover:bg-pink-100 to today unmarked cell without onClick', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={true} isBeforeStart={false} isFuture={false} />);
+    expect(screen.getByRole('gridcell').className).not.toContain('hover:bg-pink-100');
+  });
+
+  it('applies active:scale-[0.97] to interactive cells', () => {
+    const onClick = vi.fn();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} onClick={onClick} />);
+    expect(screen.getByRole('gridcell').className).toContain('active:scale-[0.97]');
+  });
+
+  it('does not apply active:scale-[0.97] to inactive cells', () => {
+    render(<DayCell date={new Date(2026, 2, 1)} isToday={false} isBeforeStart={true} isFuture={false} />);
+    expect(screen.getByRole('gridcell').className).not.toContain('active:scale-[0.97]');
+  });
 });

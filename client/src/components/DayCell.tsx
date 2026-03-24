@@ -22,16 +22,19 @@ export default function DayCell({ date, isToday, isBeforeStart, isFuture, isMark
     cellClasses += ' bg-surface text-muted cursor-default';
   } else if (isMarked && isToday) {
     cellClasses += ' bg-pink-500 text-white ring-2 ring-pink-700 font-bold';
+    if (onClick) cellClasses += ' hover:bg-pink-600';
   } else if (isMarked) {
     cellClasses += ' bg-pink-500 text-white font-bold';
+    if (onClick) cellClasses += ' hover:bg-pink-600';
   } else if (isToday) {
     cellClasses += ' bg-pink-50 ring-2 ring-pink-500 text-pink-700';
+    if (onClick) cellClasses += ' hover:bg-pink-100';
   } else {
     cellClasses += ' bg-background border border-border text-text hover:bg-pink-50';
   }
 
   if (!inactive && !isMutating && onClick) {
-    cellClasses += ' cursor-pointer';
+    cellClasses += ' cursor-pointer active:scale-[0.97]';
   }
 
   if (isMutating) {
