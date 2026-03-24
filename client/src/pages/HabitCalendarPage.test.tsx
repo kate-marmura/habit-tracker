@@ -710,4 +710,72 @@ describe('HabitCalendarPage', () => {
 
     vi.useRealTimers();
   });
+
+  it('renders MonthNavigator with current month label when habit loads', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    const now = new Date();
+    const expectedLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    expect(screen.getByText(expectedLabel)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Previous month' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next month' })).toBeInTheDocument();
+  });
+
+  it('clicking previous month changes calendar and fetches entries for that month', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: 'Previous month' }));
+
+    const now = new Date();
+    const prevMonth = now.getMonth() === 0 ? 12 : now.getMonth();
+    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    const expectedLabel = new Date(prevYear, prevMonth - 1).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    });
+    expect(await screen.findByText(expectedLabel)).toBeInTheDocument();
+
+    const expectedMonthStr = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
+    await vi.waitFor(() => {
+      expect(vi.mocked(fetchEntries)).toHaveBeenCalledWith('abc-123', expectedMonthStr);
+    });
+  });
+
+  it('next month button is disabled when already at current month', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    const nextBtn = screen.getByRole('button', { name: 'Next month' });
+    expect(nextBtn).toBeDisabled();
+  });
+
+  it('navigating to a different month and back preserves habit name', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: 'Previous month' }));
+
+    expect(screen.getByText('Exercise')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Next month' }));
+    expect(screen.getByText('Exercise')).toBeInTheDocument();
+  });
 });

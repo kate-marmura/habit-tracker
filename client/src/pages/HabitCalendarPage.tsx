@@ -15,6 +15,7 @@ import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
 import ConfirmModal from '../components/ConfirmModal';
+import MonthNavigator from '../components/MonthNavigator';
 import CalendarGrid from '../components/CalendarGrid';
 import ErrorToast from '../components/ErrorToast';
 import UndoToast from '../components/UndoToast';
@@ -43,8 +44,9 @@ export default function HabitCalendarPage() {
   const undoStateRef = useRef<UndoState | null>(null);
 
   const now = new Date();
-  const [calYear] = useState(now.getFullYear());
-  const [calMonth] = useState(now.getMonth() + 1);
+  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth() + 1);
+  const isCurrentMonth = calYear === now.getFullYear() && calMonth === now.getMonth() + 1;
   const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
   const entriesQueryKey = useMemo(() => ['entries', id, monthStr], [id, monthStr]);
 
@@ -160,6 +162,27 @@ export default function HabitCalendarPage() {
     },
     [id, queryClient, entriesQueryKey],
   );
+
+  const commitPendingUndo = useCallback(() => {
+    if (!undoStateRef.current) return;
+    const { timerId, dateStr } = undoStateRef.current;
+    clearTimeout(timerId);
+    setUndoToastMessage(null);
+    fireDelete(dateStr);
+  }, [fireDelete]);
+
+  const goToPrevMonth = useCallback(() => {
+    commitPendingUndo();
+    if (calMonth === 1) { setCalYear((y) => y - 1); setCalMonth(12); }
+    else { setCalMonth((m) => m - 1); }
+  }, [calMonth, commitPendingUndo]);
+
+  const goToNextMonth = useCallback(() => {
+    if (isCurrentMonth) return;
+    commitPendingUndo();
+    if (calMonth === 12) { setCalYear((y) => y + 1); setCalMonth(1); }
+    else { setCalMonth((m) => m + 1); }
+  }, [calMonth, isCurrentMonth, commitPendingUndo]);
 
   const handleUnmark = useCallback(
     (dateStr: string) => {
@@ -312,6 +335,15 @@ export default function HabitCalendarPage() {
               <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
                 {entriesQuery.error instanceof Error ? entriesQuery.error.message : 'Could not load entries.'}
               </div>
+            )}
+            {habit && (
+              <MonthNavigator
+                year={calYear}
+                month={calMonth}
+                onPrev={goToPrevMonth}
+                onNext={goToNextMonth}
+                canGoNext={!isCurrentMonth}
+              />
             )}
             {habit && (
               <CalendarGrid

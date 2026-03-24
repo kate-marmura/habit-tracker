@@ -1,5 +1,5 @@
 # generated: 2026-03-20
-# last_updated: 2026-03-23T12:00:00
+# last_updated: 2026-03-24T12:00:00
 # project: habit-tracker
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-03-20
-last_updated: 2026-03-23
+last_updated: 2026-03-24
 project: habit-tracker
 project_key: NOKEY
 tracking_system: file-system
@@ -80,7 +80,7 @@ development_status:
   4-2-fetch-and-display-day-entries: done
   4-3-tap-to-mark-a-day-optimistic-ui: done
   4-4-tap-to-unmark-a-day-optimistic-ui: done
-  4-5-month-navigation: backlog
+  4-5-month-navigation: done
   4-6-habit-switching-on-calendar: backlog
   4-7-daycell-visual-states: backlog
   epic-4-retrospective: optional
