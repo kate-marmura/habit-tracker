@@ -121,4 +121,21 @@ describe('DayCell', () => {
     expect(cell.className).toContain('transition-all');
     expect(cell.className).toContain('duration-150');
   });
+
+  it('shows cursor-pointer on clickable marked cells', () => {
+    const onClick = vi.fn();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} onClick={onClick} />);
+    expect(screen.getByRole('gridcell').className).toContain('cursor-pointer');
+  });
+
+  it('shows cursor-pointer on clickable today cells', () => {
+    const onClick = vi.fn();
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={true} isBeforeStart={false} isFuture={false} onClick={onClick} />);
+    expect(screen.getByRole('gridcell').className).toContain('cursor-pointer');
+  });
+
+  it('does not show cursor-pointer on marked cells without onClick', () => {
+    render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
+    expect(screen.getByRole('gridcell').className).not.toContain('cursor-pointer');
+  });
 });

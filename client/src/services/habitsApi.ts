@@ -36,3 +36,7 @@ export function fetchEntries(habitId: string, month: string): Promise<DayEntry[]
 export function createEntry(habitId: string, date: string): Promise<DayEntry> {
   return post<DayEntry>(`/api/habits/${habitId}/entries`, { date });
 }
+
+export function deleteEntry(habitId: string, date: string): Promise<void> {
+  return del<void>(`/api/habits/${habitId}/entries/${date}`);
+}

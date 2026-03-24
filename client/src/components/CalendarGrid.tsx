@@ -68,7 +68,7 @@ export default function CalendarGrid({ year, month, habitStartDate, markedDates,
               isFuture={isAfter(day, today)}
               isMarked={isMarked}
               isMutating={pendingDates?.has(dateStr)}
-              onClick={!dayIsInactive && !isMarked && onDayClick ? () => onDayClick(dateStr) : undefined}
+              onClick={!dayIsInactive && onDayClick ? () => onDayClick(dateStr) : undefined}
             />
           );
         })}

@@ -1,7 +1,7 @@
 import { Router, type Request } from 'express';
 import { z } from 'zod';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { listEntriesByMonth, createEntry } from '../services/entry.service.js';
+import { listEntriesByMonth, createEntry, deleteEntry } from '../services/entry.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
 const habitIdParam = z.string().uuid('Invalid habit ID');
@@ -32,11 +32,23 @@ router.get('/', async (req: Request<{ id: string }>, res) => {
   res.json(entries);
 });
 
+const dateParam = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format')
+  .refine(isValidCalendarDateString, 'Date is not a valid calendar date');
+
 router.post('/', async (req: Request<{ id: string }>, res) => {
   const id = habitIdParam.parse(req.params.id);
   const { date } = createEntryBody.parse(req.body);
   const entry = await createEntry(res.locals.userId, id, date, res.locals.timezone);
   res.status(201).json(entry);
+});
+
+router.delete('/:date', async (req: Request<{ id: string; date: string }>, res) => {
+  const id = habitIdParam.parse(req.params.id);
+  const date = dateParam.parse(req.params.date);
+  await deleteEntry(res.locals.userId, id, date);
+  res.status(204).send();
 });
 
 export default router;

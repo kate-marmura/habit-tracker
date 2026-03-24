@@ -99,7 +99,7 @@ describe('CalendarGrid', () => {
     expect(onDayClick).toHaveBeenCalledWith('2026-03-10');
   });
 
-  it('does not fire onDayClick for already-marked days', async () => {
+  it('fires onDayClick for already-marked days (unmark handled by parent)', async () => {
     const onDayClick = vi.fn();
     const markedDates = new Set(['2026-03-10']);
     const user = userEvent.setup();
@@ -107,7 +107,7 @@ describe('CalendarGrid', () => {
 
     const cells = screen.getAllByRole('gridcell');
     await user.click(cells[9]);
-    expect(onDayClick).not.toHaveBeenCalled();
+    expect(onDayClick).toHaveBeenCalledWith('2026-03-10');
   });
 
   it('passes pendingDates — mutating cells have opacity-60', () => {

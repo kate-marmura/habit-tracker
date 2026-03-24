@@ -27,7 +27,11 @@ export default function DayCell({ date, isToday, isBeforeStart, isFuture, isMark
   } else if (isToday) {
     cellClasses += ' bg-pink-50 ring-2 ring-pink-500 text-pink-700';
   } else {
-    cellClasses += ` bg-background border border-border text-text hover:bg-pink-50${onClick ? ' cursor-pointer' : ''}`;
+    cellClasses += ' bg-background border border-border text-text hover:bg-pink-50';
+  }
+
+  if (!inactive && !isMutating && onClick) {
+    cellClasses += ' cursor-pointer';
   }
 
   if (isMutating) {

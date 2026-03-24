@@ -35,6 +35,7 @@ vi.mock('../services/habitsApi', () => ({
   deleteHabit: vi.fn(),
   fetchEntries: vi.fn().mockResolvedValue([]),
   createEntry: vi.fn(),
+  deleteEntry: vi.fn().mockResolvedValue(undefined),
 }));
 
 function createMockToken(): string {
@@ -570,5 +571,143 @@ describe('HabitCalendarPage', () => {
     await user.click(cells[9]);
 
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
+  });
+
+  it('optimistically removes mark when clicking a marked day', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    const cells = screen.getAllByRole('gridcell');
+    await user.click(cells[9]);
+
+    await vi.waitFor(() => {
+      const updatedCells = screen.getAllByRole('gridcell');
+      expect(updatedCells[9].className).not.toContain('bg-pink-500');
+    });
+
+    vi.useRealTimers();
+  });
+
+  it('shows undo toast after clicking a marked day', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    expect(await screen.findByText('Day unmarked')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
+  it('restores mark when Undo is clicked and does not call deleteEntry', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+    vi.mocked(deleteEntry).mockResolvedValue(undefined);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    await screen.findByText('Day unmarked');
+
+    await user.click(screen.getByRole('button', { name: /undo/i }));
+
+    await vi.waitFor(() => {
+      const updatedCells = screen.getAllByRole('gridcell');
+      expect(updatedCells[9].className).toContain('bg-pink-500');
+    });
+
+    expect(vi.mocked(deleteEntry)).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('calls deleteEntry after 3-second undo timeout expires', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+    vi.mocked(deleteEntry).mockResolvedValue(undefined);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    await screen.findByText('Day unmarked');
+
+    await vi.advanceTimersByTimeAsync(3000);
+
+    await vi.waitFor(() => {
+      expect(vi.mocked(deleteEntry)).toHaveBeenCalledWith('abc-123', '2026-03-10');
+    });
+
+    vi.useRealTimers();
+  });
+
+  it('shows error toast and reverts visual state when deleteEntry fails', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+    vi.mocked(deleteEntry).mockRejectedValue(new Error('Server error'));
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderPage();
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    await screen.findByText('Day unmarked');
+
+    await vi.advanceTimersByTimeAsync(3000);
+
+    expect(await screen.findByText('Server error')).toBeInTheDocument();
+
+    await vi.waitFor(() => {
+      const updatedCells = screen.getAllByRole('gridcell');
+      expect(updatedCells[9].className).toContain('bg-pink-500');
+    });
+
+    vi.useRealTimers();
   });
 });

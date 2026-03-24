@@ -1,7 +1,11 @@
 import { Prisma } from '../generated/prisma/client.js';
 import { prisma } from '../lib/prisma.js';
 import { AppError } from '../middleware/error-handler.js';
-import { formatCalendarDate, parseCalendarDate, getTodayInTimezone } from '../lib/calendar-date.js';
+import {
+  formatCalendarDate,
+  parseCalendarDate,
+  getTodayInTimezone,
+} from '../lib/calendar-date.js';
 
 export async function listEntriesByMonth(userId: string, habitId: string, month: string) {
   const habit = await prisma.habit.findFirst({
@@ -65,4 +69,19 @@ export async function createEntry(userId: string, habitId: string, date: string,
     }
     throw err;
   }
+}
+
+export async function deleteEntry(userId: string, habitId: string, date: string) {
+  const habit = await prisma.habit.findFirst({
+    where: { id: habitId, userId },
+    select: { id: true },
+  });
+
+  if (!habit) {
+    throw new AppError(404, 'NOT_FOUND', 'Habit not found');
+  }
+
+  await prisma.dayEntry.deleteMany({
+    where: { habitId, entryDate: parseCalendarDate(date) },
+  });
 }

@@ -1,16 +1,30 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
-import { fetchHabitById, archiveHabit, unarchiveHabit, fetchEntries, createEntry } from '../services/habitsApi';
+import {
+  fetchHabitById,
+  archiveHabit,
+  unarchiveHabit,
+  fetchEntries,
+  createEntry,
+  deleteEntry,
+} from '../services/habitsApi';
 import HabitSettingsDropdown from '../components/HabitSettingsDropdown';
 import EditHabitModal from '../components/EditHabitModal';
 import DeleteHabitModal from '../components/DeleteHabitModal';
 import ConfirmModal from '../components/ConfirmModal';
 import CalendarGrid from '../components/CalendarGrid';
 import ErrorToast from '../components/ErrorToast';
+import UndoToast from '../components/UndoToast';
 import type { Habit } from '../types/habit';
+
+interface UndoState {
+  dateStr: string;
+  timerId: ReturnType<typeof setTimeout>;
+  previousEntries: Set<string> | undefined;
+}
 
 export default function HabitCalendarPage() {
   const navigate = useNavigate();
@@ -24,13 +38,15 @@ export default function HabitCalendarPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [undoToastMessage, setUndoToastMessage] = useState<string | null>(null);
   const [pendingDates, setPendingDates] = useState<Set<string>>(new Set());
+  const undoStateRef = useRef<UndoState | null>(null);
 
   const now = new Date();
   const [calYear] = useState(now.getFullYear());
   const [calMonth] = useState(now.getMonth() + 1);
   const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
-  const entriesQueryKey = ['entries', id, monthStr];
+  const entriesQueryKey = useMemo(() => ['entries', id, monthStr], [id, monthStr]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -72,6 +88,14 @@ export default function HabitCalendarPage() {
     load();
     return () => { cancelled = true; };
   }, [isAuthenticated, id]);
+
+  useEffect(() => {
+    return () => {
+      if (undoStateRef.current) {
+        clearTimeout(undoStateRef.current.timerId);
+      }
+    };
+  }, []);
 
   const entriesQuery = useQuery({
     queryKey: entriesQueryKey,
@@ -115,15 +139,85 @@ export default function HabitCalendarPage() {
     },
   });
 
-  const dismissToast = useCallback(() => setToastMessage(null), []);
-
-  const handleMarkDay = useCallback(
-    (dateStr: string) => {
-      if (entriesQuery.data?.has(dateStr) || pendingDates.has(dateStr)) return;
-      markMutation.mutate(dateStr);
+  const fireDelete = useCallback(
+    async (dateStr: string) => {
+      setUndoToastMessage(null);
+      undoStateRef.current = null;
+      try {
+        await deleteEntry(id!, dateStr);
+        queryClient.invalidateQueries({ queryKey: entriesQueryKey });
+      } catch (err) {
+        queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => new Set([...(old ?? []), dateStr]));
+        const msg = err instanceof Error ? err.message : 'Could not unmark day. Please try again.';
+        setToastMessage(msg);
+      } finally {
+        setPendingDates((prev) => {
+          const next = new Set(prev);
+          next.delete(dateStr);
+          return next;
+        });
+      }
     },
-    [entriesQuery.data, pendingDates, markMutation],
+    [id, queryClient, entriesQueryKey],
   );
+
+  const handleUnmark = useCallback(
+    (dateStr: string) => {
+      setToastMessage(null);
+      if (undoStateRef.current) {
+        const prev = undoStateRef.current;
+        clearTimeout(prev.timerId);
+        fireDelete(prev.dateStr);
+      }
+
+      const snapshot = queryClient.getQueryData<Set<string>>(entriesQueryKey);
+      queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => {
+        const next = new Set(old);
+        next.delete(dateStr);
+        return next;
+      });
+      setPendingDates((prev) => new Set([...prev, dateStr]));
+      setUndoToastMessage('Day unmarked');
+
+      const timerId = setTimeout(() => {
+        fireDelete(dateStr);
+      }, 3000);
+
+      undoStateRef.current = { dateStr, timerId, previousEntries: snapshot };
+    },
+    [queryClient, entriesQueryKey, fireDelete],
+  );
+
+  const handleUndo = useCallback(() => {
+    if (!undoStateRef.current) return;
+    const { timerId, previousEntries, dateStr } = undoStateRef.current;
+    clearTimeout(timerId);
+    if (previousEntries) {
+      queryClient.setQueryData(entriesQueryKey, previousEntries);
+    }
+    setPendingDates((prev) => {
+      const next = new Set(prev);
+      next.delete(dateStr);
+      return next;
+    });
+    setUndoToastMessage(null);
+    undoStateRef.current = null;
+  }, [queryClient, entriesQueryKey]);
+
+  const handleDayClick = useCallback(
+    (dateStr: string) => {
+      if (pendingDates.has(dateStr)) return;
+      const markedSet = entriesQuery.data;
+      if (markedSet?.has(dateStr)) {
+        handleUnmark(dateStr);
+      } else {
+        markMutation.mutate(dateStr);
+      }
+    },
+    [pendingDates, entriesQuery.data, handleUnmark, markMutation],
+  );
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
 
   function handleSaved(updated: Habit) {
     setHabit(updated);
@@ -226,7 +320,7 @@ export default function HabitCalendarPage() {
                 habitStartDate={habit.startDate}
                 markedDates={markedDates}
                 pendingDates={pendingDates}
-                onDayClick={!habit.isArchived ? handleMarkDay : undefined}
+                onDayClick={!habit.isArchived ? handleDayClick : undefined}
               />
             )}
             {habit?.description && (
@@ -264,6 +358,7 @@ export default function HabitCalendarPage() {
         />
       )}
 
+      <UndoToast message={undoToastMessage} onUndo={handleUndo} />
       <ErrorToast message={toastMessage} onDismiss={dismissToast} />
     </div>
   );
