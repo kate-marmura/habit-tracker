@@ -20,6 +20,10 @@ vi.mock('../services/api', () => ({
   },
 }));
 
+vi.mock('../services/authApi', () => ({
+  resetPassword: vi.fn(),
+}));
+
 function LoginSpy() {
   return <div data-testid="login-page">Login Page</div>;
 }
@@ -67,9 +71,8 @@ describe('ResetPasswordPage', () => {
   });
 
   it('redirects to /login on successful submit', async () => {
-    const { post } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockResolvedValueOnce({ success: true });
+    const { resetPassword } = await import('../services/authApi');
+    vi.mocked(resetPassword).mockResolvedValueOnce({ message: 'ok' });
 
     const user = userEvent.setup();
     renderPage();
@@ -82,9 +85,9 @@ describe('ResetPasswordPage', () => {
   });
 
   it('shows invalid/expired-link message on INVALID_RESET_TOKEN', async () => {
-    const { post, ApiError } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockRejectedValueOnce(
+    const { ApiError } = await import('../services/api');
+    const { resetPassword } = await import('../services/authApi');
+    vi.mocked(resetPassword).mockRejectedValueOnce(
       new ApiError(400, 'INVALID_RESET_TOKEN', 'This password reset link is invalid or has expired'),
     );
 
@@ -101,9 +104,9 @@ describe('ResetPasswordPage', () => {
   });
 
   it('ignores REQUEST_ABORTED silently', async () => {
-    const { post, ApiError } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
+    const { ApiError } = await import('../services/api');
+    const { resetPassword } = await import('../services/authApi');
+    vi.mocked(resetPassword).mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
 
     const user = userEvent.setup();
     renderPage();

@@ -28,6 +28,7 @@ vi.mock('../services/api', () => ({
 vi.mock('../services/habitsApi', () => ({
   fetchActiveHabits: vi.fn(),
   fetchArchivedHabits: vi.fn(),
+  unarchiveHabit: vi.fn(),
 }));
 
 function createMockToken(): string {
@@ -60,9 +61,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function renderPage() {
+function renderPage(
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+) {
   seedAuth();
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <MemoryRouter initialEntries={['/habits/archived']}>
       <QueryClientProvider client={queryClient}>
@@ -158,5 +160,27 @@ describe('ArchivedHabitsPage', () => {
     await user.click(screen.getByRole('button', { name: /try again/i }));
 
     expect(await screen.findByText('Old Habit')).toBeInTheDocument();
+  });
+
+  it('moves unarchived habit into the active habits cache', async () => {
+    const { fetchArchivedHabits, unarchiveHabit } = await import('../services/habitsApi');
+    const activeHabit = { ...mockArchivedHabits[0], isArchived: false };
+    vi.mocked(fetchArchivedHabits).mockResolvedValueOnce(mockArchivedHabits);
+    vi.mocked(unarchiveHabit).mockResolvedValueOnce(activeHabit);
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient.setQueryData<Habit[]>(['habits'], []);
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], mockArchivedHabits);
+
+    const user = userEvent.setup();
+    renderPage(queryClient);
+    await screen.findByText('Old Habit');
+
+    await user.click(screen.getByRole('button', { name: /unarchive old habit/i }));
+
+    await vi.waitFor(() => {
+      expect(queryClient.getQueryData<Habit[]>(['habits'])).toEqual([activeHabit]);
+      expect(queryClient.getQueryData<Habit[]>(['archivedHabits'])).toEqual([]);
+    });
   });
 });

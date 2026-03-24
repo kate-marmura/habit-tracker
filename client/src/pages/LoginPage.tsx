@@ -1,12 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { post, ApiError } from '../services/api';
-
-interface LoginResponse {
-  token: string;
-  user: { id: string; email: string };
-}
+import { ApiError } from '../services/api';
+import { login as loginApi } from '../services/authApi';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -56,7 +52,7 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      const data = await post<LoginResponse>('/api/auth/login', { email, password });
+      const data = await loginApi(email, password);
       login(data.token, data.user);
       navigate('/habits');
     } catch (err) {

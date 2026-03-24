@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { post, ApiError } from '../services/api';
+import { ApiError } from '../services/api';
+import { resetPassword as resetPasswordApi } from '../services/authApi';
 
 const PASSWORD_RULES = [
   { test: (p: string) => p.length >= 8, label: 'At least 8 characters' },
@@ -84,7 +85,7 @@ export default function ResetPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      await post('/api/auth/reset-password', { token: token!.trim(), newPassword });
+      await resetPasswordApi(token!.trim(), newPassword);
       navigate('/login', { state: { message: 'Password reset successfully. Please log in.' } });
     } catch (err) {
       if (err instanceof ApiError) {

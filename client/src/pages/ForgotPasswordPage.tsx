@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { post, ApiError } from '../services/api';
+import { ApiError } from '../services/api';
+import { forgotPassword as forgotPasswordApi } from '../services/authApi';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -37,7 +38,7 @@ export default function ForgotPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      await post('/api/auth/forgot-password', { email });
+      await forgotPasswordApi(email);
       setSubmitted(true);
     } catch (err) {
       if (err instanceof ApiError) {

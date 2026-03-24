@@ -77,9 +77,11 @@ function HabitsListStub() {
   return <div data-testid="habits-list-page">Habits List</div>;
 }
 
-function renderPage(habitId = 'abc-123') {
+function renderPage(
+  habitId = 'abc-123',
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+) {
   seedAuth();
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <MemoryRouter initialEntries={[`/habits/${habitId}`]}>
       <QueryClientProvider client={queryClient}>
@@ -401,6 +403,29 @@ describe('HabitCalendarPage', () => {
     expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
   });
 
+  it('syncs active and archived caches before navigating after archive', async () => {
+    const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
+    const archivedHabit = { ...mockHabit, isArchived: true };
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+    vi.mocked(archiveHabit).mockResolvedValueOnce(archivedHabit);
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient.setQueryData<Habit[]>(['habits'], [mockHabit]);
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], []);
+
+    const user = userEvent.setup();
+    renderPage('abc-123', queryClient);
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /archive/i }));
+    await user.click(screen.getByRole('button', { name: /^archive$/i }));
+
+    expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+    expect(queryClient.getQueryData<Habit[]>(['habits'])).toEqual([]);
+    expect(queryClient.getQueryData<Habit[]>(['archivedHabits'])).toEqual([archivedHabit]);
+  });
+
   it('does not archive when ConfirmModal is cancelled', async () => {
     const { fetchHabitById, archiveHabit } = await import('../services/habitsApi');
     vi.mocked(archiveHabit).mockClear();
@@ -482,6 +507,28 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('menuitem', { name: /unarchive/i }));
 
     expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+  });
+
+  it('syncs active and archived caches before navigating after unarchive', async () => {
+    const { fetchHabitById, unarchiveHabit } = await import('../services/habitsApi');
+    const archivedHabit = { ...mockHabit, isArchived: true };
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(archivedHabit);
+    vi.mocked(unarchiveHabit).mockResolvedValueOnce(mockHabit);
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient.setQueryData<Habit[]>(['habits'], []);
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], [archivedHabit]);
+
+    const user = userEvent.setup();
+    renderPage('abc-123', queryClient);
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: /habit settings/i }));
+    await user.click(screen.getByRole('menuitem', { name: /unarchive/i }));
+
+    expect(await screen.findByTestId('habits-list-page')).toBeInTheDocument();
+    expect(queryClient.getQueryData<Habit[]>(['habits'])).toEqual([mockHabit]);
+    expect(queryClient.getQueryData<Habit[]>(['archivedHabits'])).toEqual([]);
   });
 
   it('shows HABIT_LIMIT_REACHED error when unarchiving with 10 active habits', async () => {

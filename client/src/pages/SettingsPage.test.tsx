@@ -23,6 +23,10 @@ vi.mock('../services/api', () => ({
   },
 }));
 
+vi.mock('../services/authApi', () => ({
+  changePassword: vi.fn(),
+}));
+
 function createMockToken(): string {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = btoa(
@@ -90,8 +94,8 @@ describe('SettingsPage', () => {
   });
 
   it('submits valid data and shows success confirmation', async () => {
-    const { put } = await import('../services/api');
-    vi.mocked(put).mockResolvedValueOnce({ success: true, message: 'Password changed successfully' });
+    const { changePassword } = await import('../services/authApi');
+    vi.mocked(changePassword).mockResolvedValueOnce(undefined);
 
     const user = userEvent.setup();
     renderSettings();
@@ -105,8 +109,9 @@ describe('SettingsPage', () => {
   });
 
   it('shows current-password error on 401 INVALID_CURRENT_PASSWORD', async () => {
-    const { put, ApiError } = await import('../services/api');
-    vi.mocked(put).mockRejectedValueOnce(
+    const { ApiError } = await import('../services/api');
+    const { changePassword } = await import('../services/authApi');
+    vi.mocked(changePassword).mockRejectedValueOnce(
       new ApiError(401, 'INVALID_CURRENT_PASSWORD', 'Current password is incorrect'),
     );
 
@@ -122,8 +127,9 @@ describe('SettingsPage', () => {
   });
 
   it('ignores REQUEST_ABORTED without noisy user-facing error', async () => {
-    const { put, ApiError } = await import('../services/api');
-    vi.mocked(put).mockRejectedValueOnce(
+    const { ApiError } = await import('../services/api');
+    const { changePassword } = await import('../services/authApi');
+    vi.mocked(changePassword).mockRejectedValueOnce(
       new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'),
     );
 

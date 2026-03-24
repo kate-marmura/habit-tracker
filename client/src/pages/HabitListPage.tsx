@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '../services/api';
 import { fetchActiveHabits, archiveHabit } from '../services/habitsApi';
 import CreateHabitModal from '../components/CreateHabitModal';
@@ -9,62 +10,55 @@ import HabitCard from '../components/HabitCard';
 import type { Habit } from '../types/habit';
 
 export default function HabitListPage() {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [reloadNonce, setReloadNonce] = useState(0);
+  const queryClient = useQueryClient();
+  const habitsQuery = useQuery({
+    queryKey: ['habits'],
+    queryFn: fetchActiveHabits,
+  });
+  const habits = habitsQuery.data ?? [];
+  const loading = habitsQuery.isLoading;
+  const error = habitsQuery.error
+    ? habitsQuery.error instanceof ApiError
+      ? habitsQuery.error.message
+      : 'Could not load habits. Please check your connection and try again.'
+    : null;
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [archivingHabit, setArchivingHabit] = useState<Habit | null>(null);
   const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
 
-  useEffect(() => {
-
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchActiveHabits();
-        if (!cancelled) setHabits(data);
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof ApiError) {
-          if (err.code === 'REQUEST_ABORTED') return;
-          setError(err.message);
-        } else {
-          setError('Could not load habits. Please check your connection and try again.');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => { cancelled = true; };
-  }, [reloadNonce]);
-
   function handleCreated(habit: Habit) {
-    setHabits((prev) => [habit, ...prev]);
+    queryClient.setQueryData<Habit[]>(['habits'], (old) => [habit, ...(old ?? [])]);
     setShowCreateModal(false);
   }
 
   function handleEditSaved(updated: Habit) {
-    setHabits((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+      old?.map((h) => (h.id === updated.id ? updated : h)),
+    );
     setEditingHabit(null);
   }
 
   async function handleArchiveConfirm() {
     if (!archivingHabit) return;
-    await archiveHabit(archivingHabit.id);
-    setHabits((prev) => prev.filter((h) => h.id !== archivingHabit.id));
+    const archivedHabit = await archiveHabit(archivingHabit.id);
+    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+      old?.filter((h) => h.id !== archivingHabit.id),
+    );
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+      old ? [archivedHabit, ...old.filter((h) => h.id !== archivedHabit.id)] : old,
+    );
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
+    void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
     setArchivingHabit(null);
   }
 
   function handleDeleted() {
     if (!deletingHabit) return;
-    setHabits((prev) => prev.filter((h) => h.id !== deletingHabit.id));
+    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+      old?.filter((h) => h.id !== deletingHabit.id),
+    );
     setDeletingHabit(null);
   }
 
@@ -91,7 +85,7 @@ export default function HabitListPage() {
             <p className="text-red-600 mb-4">{error}</p>
             <button
               type="button"
-              onClick={() => setReloadNonce((n) => n + 1)}
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['habits'] })}
               className="text-pink-500 hover:text-pink-600 font-medium text-sm"
             >
               Try again

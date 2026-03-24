@@ -20,6 +20,10 @@ vi.mock('../services/api', () => ({
   },
 }));
 
+vi.mock('../services/authApi', () => ({
+  forgotPassword: vi.fn(),
+}));
+
 function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -63,9 +67,8 @@ describe('ForgotPasswordPage', () => {
   });
 
   it('shows neutral success message after successful submit', async () => {
-    const { post } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockResolvedValueOnce({ success: true });
+    const { forgotPassword } = await import('../services/authApi');
+    vi.mocked(forgotPassword).mockResolvedValueOnce({ message: 'ok' });
 
     const user = userEvent.setup();
     renderPage();
@@ -79,9 +82,9 @@ describe('ForgotPasswordPage', () => {
   });
 
   it('shows friendly message on 429 rate limit', async () => {
-    const { post, ApiError } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockRejectedValueOnce(
+    const { ApiError } = await import('../services/api');
+    const { forgotPassword } = await import('../services/authApi');
+    vi.mocked(forgotPassword).mockRejectedValueOnce(
       new ApiError(
         429,
         'RATE_LIMIT_EXCEEDED',
@@ -101,9 +104,9 @@ describe('ForgotPasswordPage', () => {
   });
 
   it('ignores REQUEST_ABORTED silently', async () => {
-    const { post, ApiError } = await import('../services/api');
-    const mockPost = vi.mocked(post);
-    mockPost.mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
+    const { ApiError } = await import('../services/api');
+    const { forgotPassword } = await import('../services/authApi');
+    vi.mocked(forgotPassword).mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
 
     const user = userEvent.setup();
     renderPage();

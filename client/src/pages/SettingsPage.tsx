@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { put, ApiError } from '../services/api';
+import { ApiError } from '../services/api';
+import { changePassword as changePasswordApi } from '../services/authApi';
 
 const PASSWORD_RULES = [
   { test: (p: string) => p.length >= 8, label: 'At least 8 characters' },
@@ -61,7 +62,7 @@ export default function SettingsPage() {
 
     setIsSubmitting(true);
     try {
-      await put('/api/auth/change-password', { currentPassword, newPassword });
+      await changePasswordApi(currentPassword, newPassword);
       setSuccess(true);
       setCurrentPassword('');
       setNewPassword('');

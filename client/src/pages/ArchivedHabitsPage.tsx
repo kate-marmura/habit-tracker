@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { ApiError } from '../services/api';
 import { fetchArchivedHabits, unarchiveHabit } from '../services/habitsApi';
@@ -8,56 +9,51 @@ import DeleteHabitModal from '../components/DeleteHabitModal';
 import type { Habit } from '../types/habit';
 
 export default function ArchivedHabitsPage() {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [reloadNonce, setReloadNonce] = useState(0);
+  const queryClient = useQueryClient();
+  const habitsQuery = useQuery({
+    queryKey: ['archivedHabits'],
+    queryFn: fetchArchivedHabits,
+  });
+  const habits = habitsQuery.data ?? [];
+  const loading = habitsQuery.isLoading;
+  const queryError = habitsQuery.error
+    ? habitsQuery.error instanceof ApiError
+      ? habitsQuery.error.message
+      : 'Could not load archived habits. Please check your connection and try again.'
+    : null;
+
+  const [actionError, setActionError] = useState<string | null>(null);
   const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
 
-  useEffect(() => {
-
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchArchivedHabits();
-        if (!cancelled) setHabits(data);
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof ApiError) {
-          if (err.code === 'REQUEST_ABORTED') return;
-          setError(err.message);
-        } else {
-          setError('Could not load archived habits. Please check your connection and try again.');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => { cancelled = true; };
-  }, [reloadNonce]);
+  const error = actionError ?? queryError;
 
   async function handleUnarchive(habit: Habit) {
+    setActionError(null);
     try {
-      await unarchiveHabit(habit.id);
-      setHabits((prev) => prev.filter((h) => h.id !== habit.id));
+      const activeHabit = await unarchiveHabit(habit.id);
+      queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+        old?.filter((h) => h.id !== habit.id),
+      );
+      queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+        old ? [activeHabit, ...old.filter((h) => h.id !== activeHabit.id)] : old,
+      );
+      void queryClient.invalidateQueries({ queryKey: ['habits'] });
+      void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'REQUEST_ABORTED') return;
-        setError(err.message);
+        setActionError(err.message);
       } else {
-        setError('Could not unarchive habit. Please check your connection and try again.');
+        setActionError('Could not unarchive habit. Please check your connection and try again.');
       }
     }
   }
 
   function handleDeleted() {
     if (!deletingHabit) return;
-    setHabits((prev) => prev.filter((h) => h.id !== deletingHabit.id));
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+      old?.filter((h) => h.id !== deletingHabit.id),
+    );
     setDeletingHabit(null);
   }
 
@@ -105,11 +101,11 @@ export default function ArchivedHabitsPage() {
           </ul>
         )}
 
-        {!loading && error && !habits.length && (
+        {!loading && queryError && !habits.length && (
           <div className="text-center py-4">
             <button
               type="button"
-              onClick={() => setReloadNonce((n) => n + 1)}
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['archivedHabits'] })}
               className="text-pink-500 hover:text-pink-600 font-medium text-sm"
             >
               Try again

@@ -1,12 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { post, ApiError } from '../services/api';
-
-interface RegisterResponse {
-  token: string;
-  user: { id: string; email: string };
-}
+import { ApiError } from '../services/api';
+import { register as registerApi } from '../services/authApi';
 
 const PASSWORD_RULES = [
   { test: (p: string) => p.length >= 8, label: 'At least 8 characters' },
@@ -68,7 +64,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      const data = await post<RegisterResponse>('/api/auth/register', { email, password });
+      const data = await registerApi(email, password);
       login(data.token, data.user);
       navigate('/habits');
     } catch (err) {

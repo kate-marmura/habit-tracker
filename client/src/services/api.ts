@@ -107,7 +107,14 @@ async function trackedFetch<T>(
     if (isAbortError) {
       throw new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled');
     }
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(
+      0,
+      'NETWORK_ERROR',
+      'Could not connect to the server. Please check your internet connection and try again.',
+    );
   } finally {
     activeControllers.delete(controller);
   }

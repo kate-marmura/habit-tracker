@@ -36,9 +36,6 @@ export default function HabitCalendarPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
-  const [habit, setHabit] = useState<Habit | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -52,6 +49,22 @@ export default function HabitCalendarPage() {
   const [calMonth, setCalMonth] = useState(now.getMonth() + 1);
   const isCurrentMonth = calYear === now.getFullYear() && calMonth === now.getMonth() + 1;
 
+  const validId = !!id?.trim();
+  const habitQuery = useQuery({
+    queryKey: ['habit', id],
+    queryFn: () => fetchHabitById(id!),
+    enabled: validId,
+  });
+  const habit = habitQuery.data ?? null;
+  const loading = !validId ? false : habitQuery.isLoading;
+  const error = !validId
+    ? 'This habit link is invalid.'
+    : habitQuery.error
+      ? habitQuery.error instanceof ApiError
+        ? habitQuery.error.message
+        : 'Could not load habit. Please check your connection and try again.'
+      : null;
+
   const habitStartDate = habit
     ? parse(habit.startDate, 'yyyy-MM-dd', new Date())
     : null;
@@ -63,39 +76,6 @@ export default function HabitCalendarPage() {
   const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
   const entriesQueryKey = useMemo(() => ['entries', id, monthStr], [id, monthStr]);
   const statsQueryKey = useMemo(() => ['stats', id], [id]);
-
-  useEffect(() => {
-    if (!id?.trim()) {
-      setHabit(null);
-      setError('This habit link is invalid.');
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchHabitById(id!);
-        if (!cancelled) setHabit(data);
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof ApiError) {
-          if (err.code === 'REQUEST_ABORTED') return;
-          setError(err.message);
-        } else {
-          setError('Could not load habit. Please check your connection and try again.');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => { cancelled = true; };
-  }, [id]);
 
   useEffect(() => {
     if (undoStateRef.current) {
@@ -275,28 +255,60 @@ export default function HabitCalendarPage() {
   const dismissToast = useCallback(() => setToastMessage(null), []);
 
   function handleSaved(updated: Habit) {
-    setHabit(updated);
+    queryClient.setQueryData(['habit', id], updated);
     setShowEditModal(false);
   }
 
+  function handleDeleted() {
+    if (!habit || !id) return;
+    queryClient.removeQueries({ queryKey: ['habit', id] });
+    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+      old?.filter((item) => item.id !== habit.id),
+    );
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+      old?.filter((item) => item.id !== habit.id),
+    );
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
+    void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
+    navigate('/habits', { replace: true });
+  }
+
   async function handleArchiveConfirm() {
-    if (!id) return;
-    await archiveHabit(id);
+    if (!id || !habit) return;
+    const archivedHabit = await archiveHabit(id);
+    queryClient.setQueryData(['habit', id], archivedHabit);
+    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+      old?.filter((item) => item.id !== archivedHabit.id),
+    );
+    queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+      old ? [archivedHabit, ...old.filter((item) => item.id !== archivedHabit.id)] : old,
+    );
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
+    void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
     navigate('/habits', { replace: true });
   }
 
   async function handleUnarchive() {
-    if (!id) return;
+    if (!id || !habit) return;
 
     try {
-      await unarchiveHabit(id);
+      const activeHabit = await unarchiveHabit(id);
+      queryClient.setQueryData(['habit', id], activeHabit);
+      queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+        old?.filter((item) => item.id !== activeHabit.id),
+      );
+      queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+        old ? [activeHabit, ...old.filter((item) => item.id !== activeHabit.id)] : old,
+      );
+      void queryClient.invalidateQueries({ queryKey: ['habits'] });
+      void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
       navigate('/habits', { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'REQUEST_ABORTED') return;
-        setError(err.message);
+        setToastMessage(err.message);
       } else {
-        setError('Could not unarchive habit. Please check your connection and try again.');
+        setToastMessage('Could not unarchive habit. Please check your connection and try again.');
       }
     }
   }
@@ -416,7 +428,7 @@ export default function HabitCalendarPage() {
         <DeleteHabitModal
           habit={habit}
           onClose={() => setShowDeleteModal(false)}
-          onDeleted={() => navigate('/habits', { replace: true })}
+          onDeleted={handleDeleted}
         />
       )}
 
