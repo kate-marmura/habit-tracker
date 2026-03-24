@@ -9,6 +9,7 @@ import {
   archiveHabit,
   unarchiveHabit,
   fetchEntries,
+  fetchHabitStats,
   createEntry,
   deleteEntry,
 } from '../services/habitsApi';
@@ -18,6 +19,7 @@ import DeleteHabitModal from '../components/DeleteHabitModal';
 import ConfirmModal from '../components/ConfirmModal';
 import MonthNavigator from '../components/MonthNavigator';
 import CalendarGrid from '../components/CalendarGrid';
+import StatsPanel from '../components/StatsPanel';
 import ErrorToast from '../components/ErrorToast';
 import UndoToast from '../components/UndoToast';
 import type { Habit } from '../types/habit';
@@ -61,6 +63,7 @@ export default function HabitCalendarPage() {
       : true;
   const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
   const entriesQueryKey = useMemo(() => ['entries', id, monthStr], [id, monthStr]);
+  const statsQueryKey = useMemo(() => ['stats', id], [id]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -134,6 +137,12 @@ export default function HabitCalendarPage() {
       const data = await fetchEntries(id!, monthStr);
       return new Set(data.map((e) => e.entryDate));
     },
+    enabled: !!habit && !!id,
+  });
+
+  const statsQuery = useQuery({
+    queryKey: statsQueryKey,
+    queryFn: () => fetchHabitStats(id!),
     enabled: !!habit && !!id,
   });
 
@@ -385,6 +394,9 @@ export default function HabitCalendarPage() {
                 pendingDates={pendingDates}
                 onDayClick={!habit.isArchived ? handleDayClick : undefined}
               />
+            )}
+            {!statsQuery.isError && habit && (
+              <StatsPanel stats={statsQuery.data} isLoading={statsQuery.isLoading} />
             )}
             {habit?.description && (
               <p className="text-sm text-text-secondary mt-4">{habit.description}</p>

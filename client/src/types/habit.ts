@@ -23,3 +23,11 @@ export interface DayEntry {
   id: string;
   entryDate: string;
 }
+
+export interface HabitStats {
+  currentStreak: number;
+  longestStreak: number;
+  completionRate: number;
+  totalDays: number;
+  completedDays: number;
+}

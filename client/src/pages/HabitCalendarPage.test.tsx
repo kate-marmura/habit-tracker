@@ -34,6 +34,13 @@ vi.mock('../services/habitsApi', () => ({
   unarchiveHabit: vi.fn(),
   deleteHabit: vi.fn(),
   fetchEntries: vi.fn().mockResolvedValue([]),
+  fetchHabitStats: vi.fn().mockResolvedValue({
+    currentStreak: 22,
+    longestStreak: 34,
+    completionRate: 0.95,
+    totalDays: 60,
+    completedDays: 57,
+  }),
   createEntry: vi.fn(),
   deleteEntry: vi.fn().mockResolvedValue(undefined),
 }));
@@ -152,6 +159,20 @@ describe('HabitCalendarPage', () => {
     expect(await screen.findByText('Exercise')).toBeInTheDocument();
     expect(screen.getByText('Daily workout')).toBeInTheDocument();
     expect(screen.getByText(/started 1 january 2026/i)).toBeInTheDocument();
+  });
+
+  it('renders StatsPanel with stats from fetchHabitStats below the calendar', async () => {
+    const { fetchHabitById, fetchHabitStats } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(vi.mocked(fetchHabitStats)).toHaveBeenCalledWith('abc-123');
+    expect(await screen.findByLabelText('Habit statistics')).toBeInTheDocument();
+    expect(await screen.findByText('22 days')).toBeInTheDocument();
+    expect(screen.getByText('34 days')).toBeInTheDocument();
+    expect(screen.getByText('95%')).toBeInTheDocument();
   });
 
   it('renders CalendarGrid when habit loads successfully', async () => {
