@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../contexts/AuthContext';
 import HabitCalendarPage from './HabitCalendarPage';
@@ -101,6 +101,28 @@ function renderPageWithoutHabitIdParam() {
       </QueryClientProvider>
     </MemoryRouter>,
   );
+}
+
+function renderCalendarWithRouter(initialPath: string) {
+  seedAuth();
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/habits/:id',
+        element: (
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <HabitCalendarPage />
+            </AuthProvider>
+          </QueryClientProvider>
+        ),
+      },
+    ],
+    { initialEntries: [initialPath] },
+  );
+  const view = render(<RouterProvider router={router} />);
+  return { ...view, router };
 }
 
 describe('HabitCalendarPage', () => {
@@ -777,5 +799,77 @@ describe('HabitCalendarPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Next month' }));
     expect(screen.getByText('Exercise')).toBeInTheDocument();
+  });
+
+  it('switching habit ID resets calendar to current month and fetches entries for that month', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    const habitB = { ...mockHabit, id: 'def-456', name: 'Read Books' };
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit).mockResolvedValueOnce(habitB);
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+
+    const user = userEvent.setup();
+    const { router } = renderCalendarWithRouter('/habits/abc-123');
+    await screen.findByText('Exercise');
+
+    await user.click(screen.getByRole('button', { name: 'Previous month' }));
+
+    const now = new Date();
+    const expectedCurrentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    await act(async () => {
+      router.navigate('/habits/def-456');
+    });
+
+    expect(await screen.findByText('Read Books')).toBeInTheDocument();
+
+    const callsForB = vi.mocked(fetchEntries).mock.calls.filter((c) => c[0] === 'def-456');
+    expect(callsForB.some((c) => c[1] === expectedCurrentMonthStr)).toBe(true);
+  });
+
+  it('switching habit ID clears undo toast and commits delete for the previous habit', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
+    const habitB = { ...mockHabit, id: 'def-456', name: 'Read Books' };
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit).mockResolvedValueOnce(habitB);
+    vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+    vi.mocked(deleteEntry).mockResolvedValue(undefined);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { router } = renderCalendarWithRouter('/habits/abc-123');
+    await screen.findByText('Exercise');
+
+    await vi.waitFor(() => {
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells[9].className).toContain('bg-pink-500');
+    });
+
+    await user.click(screen.getAllByRole('gridcell')[9]);
+    expect(await screen.findByText('Day unmarked')).toBeInTheDocument();
+
+    await act(async () => {
+      router.navigate('/habits/def-456');
+    });
+
+    expect(screen.queryByText('Day unmarked')).not.toBeInTheDocument();
+    expect(vi.mocked(deleteEntry)).toHaveBeenCalledWith('abc-123', '2026-03-10');
+
+    vi.useRealTimers();
+  });
+
+  it('switching habit ID loads the new habit name in the header', async () => {
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    const habitB = { ...mockHabit, id: 'def-456', name: 'Meditate' };
+    vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit).mockResolvedValueOnce(habitB);
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+
+    const { router } = renderCalendarWithRouter('/habits/abc-123');
+    await screen.findByText('Exercise');
+
+    await act(async () => {
+      router.navigate('/habits/def-456');
+    });
+
+    expect(await screen.findByText('Meditate')).toBeInTheDocument();
+    expect(screen.queryByText('Exercise')).not.toBeInTheDocument();
   });
 });

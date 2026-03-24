@@ -22,6 +22,7 @@ import UndoToast from '../components/UndoToast';
 import type { Habit } from '../types/habit';
 
 interface UndoState {
+  habitId: string;
   dateStr: string;
   timerId: ReturnType<typeof setTimeout>;
   previousEntries: Set<string> | undefined;
@@ -90,6 +91,23 @@ export default function HabitCalendarPage() {
     load();
     return () => { cancelled = true; };
   }, [isAuthenticated, id]);
+
+  useEffect(() => {
+    if (undoStateRef.current) {
+      const { timerId, dateStr, habitId: oldHabitId } = undoStateRef.current;
+      clearTimeout(timerId);
+      undoStateRef.current = null;
+      deleteEntry(oldHabitId, dateStr).catch(() => {});
+    }
+
+    const current = new Date();
+    setCalYear(current.getFullYear());
+    setCalMonth(current.getMonth() + 1);
+
+    setPendingDates(new Set());
+    setToastMessage(null);
+    setUndoToastMessage(null);
+  }, [id]);
 
   useEffect(() => {
     return () => {
@@ -206,9 +224,9 @@ export default function HabitCalendarPage() {
         fireDelete(dateStr);
       }, 3000);
 
-      undoStateRef.current = { dateStr, timerId, previousEntries: snapshot };
+      undoStateRef.current = { habitId: id!, dateStr, timerId, previousEntries: snapshot };
     },
-    [queryClient, entriesQueryKey, fireDelete],
+    [id, queryClient, entriesQueryKey, fireDelete],
   );
 
   const handleUndo = useCallback(() => {
