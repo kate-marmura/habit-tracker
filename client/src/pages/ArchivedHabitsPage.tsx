@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { ApiError } from '../services/api';
 import { fetchArchivedHabits, unarchiveHabit } from '../services/habitsApi';
 import ArchivedHabitCard from '../components/ArchivedHabitCard';
@@ -67,9 +68,11 @@ export default function ArchivedHabitsPage() {
           <h1 className="text-xl font-bold text-pink-500">Archived Habits</h1>
           <Link
             to="/habits"
-            className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+            className="flex items-center gap-1 px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+            aria-label="Back to habits"
           >
-            Back to habits
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">Back to habits</span>
           </Link>
         </div>
       </header>

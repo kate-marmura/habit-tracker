@@ -198,15 +198,14 @@ describe('HabitListPage', () => {
     expect(screen.queryByText(/create a new habit/i)).not.toBeInTheDocument();
   });
 
-  it('has link to archived habits page', async () => {
+  it('does not render per-page header nav (NavBar handles it)', async () => {
     const { fetchActiveHabits } = await import('../services/habitsApi');
     vi.mocked(fetchActiveHabits).mockResolvedValueOnce([]);
 
     renderPage();
     await screen.findByText(/create your first habit/i);
 
-    const archivedLink = screen.getByRole('link', { name: /archived/i });
-    expect(archivedLink).toHaveAttribute('href', '/habits/archived');
+    expect(screen.queryByRole('button', { name: /log out/i })).not.toBeInTheDocument();
   });
 
   it('retries fetch when Try again is clicked', async () => {

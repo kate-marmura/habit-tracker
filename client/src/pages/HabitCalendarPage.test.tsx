@@ -207,7 +207,7 @@ describe('HabitCalendarPage', () => {
     expect(await screen.findByText('Habit not found')).toBeInTheDocument();
   });
 
-  it('has back to habits link', async () => {
+  it('has back to habits link pointing to /habits for active habit', async () => {
     const { fetchHabitById } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
 
@@ -215,6 +215,16 @@ describe('HabitCalendarPage', () => {
     await screen.findByText('Exercise');
 
     expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute('href', '/habits');
+  });
+
+  it('has back to habits link pointing to /habits/archived for archived habit', async () => {
+    const { fetchHabitById } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({ ...mockHabit, isArchived: true });
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute('href', '/habits/archived');
   });
 
   it('shows settings dropdown with edit option', async () => {

@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
 import { fetchActiveHabits, archiveHabit } from '../services/habitsApi';
 import CreateHabitModal from '../components/CreateHabitModal';
@@ -11,7 +9,6 @@ import HabitCard from '../components/HabitCard';
 import type { Habit } from '../types/habit';
 
 export default function HabitListPage() {
-  const { logout } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,36 +70,6 @@ export default function HabitListPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-surface">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-pink-500">Habit Tracker</h1>
-            <p className="text-muted text-sm">Let&apos;s start a better life</p>
-          </div>
-          <div className="flex gap-3">
-            <Link
-              to="/habits/archived"
-              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
-            >
-              Archived
-            </Link>
-            <Link
-              to="/settings"
-              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
-            >
-              Settings
-            </Link>
-            <button
-              type="button"
-              onClick={logout}
-              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
-            >
-              Log out
-            </button>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-text">Your Habits</h2>

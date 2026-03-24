@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { isValid, parse } from 'date-fns';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft } from 'lucide-react';
 import { ApiError } from '../services/api';
 import {
   fetchHabitById,
@@ -331,10 +332,12 @@ export default function HabitCalendarPage() {
               />
             )}
             <Link
-              to="/habits"
-              className="px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+              to={habit?.isArchived ? '/habits/archived' : '/habits'}
+              className="flex items-center gap-1 px-4 py-1.5 rounded-lg border border-border text-text-secondary hover:bg-gray-100 transition text-sm font-medium"
+              aria-label="Back to habits"
             >
-              Back to habits
+              <ArrowLeft size={20} />
+              <span className="hidden sm:inline">Back to habits</span>
             </Link>
           </div>
         </div>
