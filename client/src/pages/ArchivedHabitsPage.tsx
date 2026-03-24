@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import { ApiError } from '../services/api';
 import { fetchArchivedHabits, unarchiveHabit } from '../services/habitsApi';
 import ArchivedHabitCard from '../components/ArchivedHabitCard';
@@ -8,8 +7,6 @@ import DeleteHabitModal from '../components/DeleteHabitModal';
 import type { Habit } from '../types/habit';
 
 export default function ArchivedHabitsPage() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +14,6 @@ export default function ArchivedHabitsPage() {
   const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
 
     let cancelled = false;
 
@@ -48,7 +38,7 @@ export default function ArchivedHabitsPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [isAuthenticated, reloadNonce]);
+  }, [reloadNonce]);
 
   async function handleUnarchive(habit: Habit) {
     try {
@@ -69,8 +59,6 @@ export default function ArchivedHabitsPage() {
     setHabits((prev) => prev.filter((h) => h.id !== deletingHabit.id));
     setDeletingHabit(null);
   }
-
-  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background">

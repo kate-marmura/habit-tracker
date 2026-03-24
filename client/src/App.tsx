@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import AuthLayout from './components/AuthLayout';
+import AppLayout from './components/AppLayout';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -18,14 +20,18 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<RootRedirect />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/habits" element={<HabitListPage />} />
-      <Route path="/habits/archived" element={<ArchivedHabitsPage />} />
-      <Route path="/habits/:id" element={<HabitCalendarPage />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      </Route>
+      <Route element={<AppLayout />}>
+        <Route path="/habits" element={<HabitListPage />} />
+        <Route path="/habits/archived" element={<ArchivedHabitsPage />} />
+        <Route path="/habits/:id" element={<HabitCalendarPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Route>
     </Routes>
   );
 }

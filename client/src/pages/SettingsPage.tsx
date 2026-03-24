@@ -1,6 +1,5 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { put, ApiError } from '../services/api';
 
 const PASSWORD_RULES = [
@@ -11,15 +10,6 @@ const PASSWORD_RULES = [
 ];
 
 export default function SettingsPage() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -93,8 +83,6 @@ export default function SettingsPage() {
       setIsSubmitting(false);
     }
   }
-
-  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">

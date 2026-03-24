@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../contexts/AuthContext';
+import AppLayout from '../components/AppLayout';
 import SettingsPage from './SettingsPage';
 import LoginPage from './LoginPage';
 
@@ -43,7 +44,9 @@ function renderSettings(authenticated = true) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Routes>
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
             <Route path="/login" element={<LoginPage />} />
           </Routes>
         </AuthProvider>

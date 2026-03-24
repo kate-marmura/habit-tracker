@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { isValid, parse } from 'date-fns';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/api';
 import {
   fetchHabitById,
@@ -35,7 +34,6 @@ interface UndoState {
 export default function HabitCalendarPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
   const { id } = useParams<{ id: string }>();
   const [habit, setHabit] = useState<Habit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,14 +64,6 @@ export default function HabitCalendarPage() {
   const statsQueryKey = useMemo(() => ['stats', id], [id]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
     if (!id?.trim()) {
       setHabit(null);
       setError('This habit link is invalid.');
@@ -104,7 +94,7 @@ export default function HabitCalendarPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [isAuthenticated, id]);
+  }, [id]);
 
   useEffect(() => {
     if (undoStateRef.current) {
@@ -309,8 +299,6 @@ export default function HabitCalendarPage() {
       }
     }
   }
-
-  if (!isAuthenticated) return null;
 
   const markedDates = entriesQuery.data ?? new Set<string>();
 
