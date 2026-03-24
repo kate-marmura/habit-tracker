@@ -1,5 +1,5 @@
 # generated: 2026-03-20
-# last_updated: 2026-03-24T10:00:00
+# last_updated: 2026-03-24T17:15:00
 # project: habit-tracker
 # project_key: NOKEY
 # tracking_system: file-system
@@ -107,6 +107,6 @@ development_status:
   7-2-responsive-navigation-bar: done
   7-3-calendar-page-desktop-two-column-layout: done
   7-4-ui-consistency-polish: done
-  7-5-client-side-routing-setup: backlog
+  7-5-client-side-routing-setup: done
   7-6-api-client-auth-interceptor: backlog
   epic-7-retrospective: optional
