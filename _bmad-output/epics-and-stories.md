@@ -13,7 +13,7 @@
 | E1 | Project Setup & Infrastructure | 6 | P0 | Monorepo scaffolding, Docker, database, QA infrastructure, CI pipeline |
 | E2 | User Authentication | 6 | P0 | Registration, login, logout, password management |
 | E3 | Habit Management | 8 | P0 | Habit CRUD, archiving, unarchiving, deletion, active limit enforcement, card actions & confirm modal |
-| E4 | Calendar View & Day Marking | 7 | P0 | Calendar grid, tap-to-mark, month navigation, optimistic UI |
+| E4 | Calendar View & Day Marking | 8 | P0 | Calendar grid, tap-to-mark, month navigation, optimistic UI, UI polish |
 | E5 | Progress & Statistics | 3 | P1 | Streak calculation, completion rate, stats panel |
 | E6 | AI Coaching | 4 | Phase 2 | LLM integration, help-me button, graceful degradation (deferred from MVP) |
 | E7 | App Shell & Navigation | 4 | P0 | Layouts, routing, protected routes, responsive nav |
@@ -644,6 +644,25 @@ The following QA practices apply to every feature story, not just this setup sto
 
 ---
 
+### E4-S8: UI Polish & UX Improvements
+
+**As a** user,
+**I want** polished date formatting, softer visual tones, a custom date picker, smarter month navigation limits, and a welcoming app subtitle,
+**so that** the app feels more refined, human-friendly, and intentional.
+
+**Acceptance Criteria:**
+
+- [ ] All user-visible dates display in `dd MMMM yyyy` format (e.g., "24 March 2026") — applies to HabitCard, ArchivedHabitCard, and HabitCalendarPage
+- [ ] Marked-day color changes from `pink-500` (`#EC4899`) to `#F3D0D7` (softer pastel pink); text and icon colors adjust for readability on the lighter background
+- [ ] Archive and Delete action text/buttons in `HabitSettingsDropdown`, `ConfirmModal`, and `DeleteHabitModal` use pink tones (`pink-500`/`pink-600`) instead of red (`red-500`/`red-600`); actual error messages remain red
+- [ ] Native `<input type="date">` in `CreateHabitModal` is replaced with a custom calendar-style date picker matching the app's design system
+- [ ] Previous-month navigation is disabled when the displayed month is at or before the habit's `startDate` month
+- [ ] "Let's start a better life" subtitle appears below "Habit Tracker" title on `HabitListPage`, `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, and `ResetPasswordPage` in grey (`text-muted`)
+
+**Refs:** Architecture §6 (Design System & Color Palette), PRD Visual Design
+
+---
+
 ## E5: Progress & Statistics
 
 **Goal:** Compute and display per-habit statistics — current streak, longest streak, and completion rate — with real-time updates when days are marked or unmarked.
@@ -908,6 +927,7 @@ The following QA practices apply to every feature story, not just this setup sto
 | E4-S5 | M |
 | E4-S6 | S |
 | E4-S7 | M |
+| E4-S8 | L |
 | E5-S1 | M |
 | E5-S2 | S |
 | E5-S3 | M |
@@ -955,6 +975,7 @@ The following QA practices apply to every feature story, not just this setup sto
 ### Sprint 5: Calendar Polish & Stats
 - E4-S5: Month Navigation
 - E4-S6: Habit Switching on Calendar
+- E4-S8: UI Polish & UX Improvements
 - E5-S1: Statistics Calculation API
 - E5-S2: Stats Panel UI Component
 - E5-S3: Real-Time Stats Update on Mark/Unmark

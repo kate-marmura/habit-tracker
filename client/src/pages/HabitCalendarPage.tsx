@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { isValid, parse } from 'date-fns';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +21,7 @@ import CalendarGrid from '../components/CalendarGrid';
 import ErrorToast from '../components/ErrorToast';
 import UndoToast from '../components/UndoToast';
 import type { Habit } from '../types/habit';
+import { formatDate } from '../utils/formatDate';
 
 interface UndoState {
   habitId: string;
@@ -48,6 +50,15 @@ export default function HabitCalendarPage() {
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth() + 1);
   const isCurrentMonth = calYear === now.getFullYear() && calMonth === now.getMonth() + 1;
+
+  const habitStartDate = habit
+    ? parse(habit.startDate, 'yyyy-MM-dd', new Date())
+    : null;
+  const canGoPrev =
+    habitStartDate && isValid(habitStartDate)
+      ? calYear > habitStartDate.getFullYear() ||
+        (calYear === habitStartDate.getFullYear() && calMonth > habitStartDate.getMonth() + 1)
+      : true;
   const monthStr = `${calYear}-${String(calMonth).padStart(2, '0')}`;
   const entriesQueryKey = useMemo(() => ['entries', id, monthStr], [id, monthStr]);
 
@@ -190,10 +201,11 @@ export default function HabitCalendarPage() {
   }, [fireDelete]);
 
   const goToPrevMonth = useCallback(() => {
+    if (!canGoPrev) return;
     commitPendingUndo();
     if (calMonth === 1) { setCalYear((y) => y - 1); setCalMonth(12); }
     else { setCalMonth((m) => m - 1); }
-  }, [calMonth, commitPendingUndo]);
+  }, [calMonth, canGoPrev, commitPendingUndo]);
 
   const goToNextMonth = useCallback(() => {
     if (isCurrentMonth) return;
@@ -360,6 +372,7 @@ export default function HabitCalendarPage() {
                 month={calMonth}
                 onPrev={goToPrevMonth}
                 onNext={goToNextMonth}
+                canGoPrev={canGoPrev}
                 canGoNext={!isCurrentMonth}
               />
             )}
@@ -376,7 +389,9 @@ export default function HabitCalendarPage() {
             {habit?.description && (
               <p className="text-sm text-text-secondary mt-4">{habit.description}</p>
             )}
-            <p className="text-xs text-muted mt-2">Started {habit?.startDate}</p>
+            <p className="text-xs text-muted mt-2">
+              Started {habit ? formatDate(habit.startDate) : ''}
+            </p>
           </div>
         )}
       </main>

@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { post, ApiError } from '../services/api';
 import type { Habit, CreateHabitPayload } from '../types/habit';
+import DatePicker from './DatePicker';
 
 function getTodayString(): string {
   const d = new Date();
@@ -140,18 +141,17 @@ export default function CreateHabitModal({ onClose, onCreated }: Props) {
             <label htmlFor="habit-start-date" className="block text-sm font-medium text-text mb-1">
               Start date <span className="text-red-500">*</span>
             </label>
-            <input
+            <DatePicker
+              key={startDate}
               id="habit-start-date"
-              type="date"
               value={startDate}
-              max={getTodayString()}
-              onChange={(e) => {
-                setStartDate(e.target.value);
+              onChange={(d) => {
+                setStartDate(d);
                 if (fieldErrors.startDate) setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
               }}
-              className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
-                fieldErrors.startDate ? 'border-red-400' : 'border-border'
-              }`}
+              maxDate={getTodayString()}
+              aria-invalid={!!fieldErrors.startDate}
+              className={fieldErrors.startDate ? 'border-red-400' : ''}
             />
             {fieldErrors.startDate && <p className="mt-1 text-sm text-red-600">{fieldErrors.startDate}</p>}
           </div>

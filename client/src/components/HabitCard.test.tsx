@@ -76,6 +76,6 @@ describe('HabitCard', () => {
   it('shows description and start date', () => {
     renderCard();
     expect(screen.getByText('Daily workout')).toBeInTheDocument();
-    expect(screen.getByText(/started 2026-03-01/i)).toBeInTheDocument();
+    expect(screen.getByText(/started 1 march 2026/i)).toBeInTheDocument();
   });
 });

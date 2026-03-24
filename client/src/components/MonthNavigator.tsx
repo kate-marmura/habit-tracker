@@ -5,10 +5,11 @@ interface Props {
   month: number;
   onPrev: () => void;
   onNext: () => void;
+  canGoPrev: boolean;
   canGoNext: boolean;
 }
 
-export default function MonthNavigator({ year, month, onPrev, onNext, canGoNext }: Props) {
+export default function MonthNavigator({ year, month, onPrev, onNext, canGoPrev, canGoNext }: Props) {
   const label = new Date(year, month - 1).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -19,7 +20,8 @@ export default function MonthNavigator({ year, month, onPrev, onNext, canGoNext 
       <button
         type="button"
         onClick={onPrev}
-        className="p-2 rounded-lg hover:bg-gray-100 transition text-text-secondary"
+        disabled={!canGoPrev}
+        className="p-2 rounded-lg transition text-text-secondary hover:bg-gray-100 disabled:text-muted disabled:opacity-50 disabled:cursor-default disabled:hover:bg-transparent"
         aria-label="Previous month"
       >
         <ChevronLeft size={20} />

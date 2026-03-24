@@ -69,8 +69,8 @@ describe('DayCell', () => {
   it('applies marked styling', () => {
     render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('bg-pink-500');
-    expect(cell.className).toContain('text-white');
+    expect(cell.className).toContain('bg-pink-marked');
+    expect(cell.className).toContain('text-pink-700');
     expect(cell.className).toContain('font-bold');
   });
 
@@ -88,16 +88,16 @@ describe('DayCell', () => {
   it('applies combined marked+today styling', () => {
     render(<DayCell date={new Date(2026, 2, 10)} isToday={true} isBeforeStart={false} isFuture={false} isMarked={true} />);
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('bg-pink-500');
-    expect(cell.className).toContain('ring-pink-700');
-    expect(cell.className).toContain('text-white');
+    expect(cell.className).toContain('bg-pink-marked');
+    expect(cell.className).toContain('ring-pink-400');
+    expect(cell.className).toContain('text-pink-700');
   });
 
   it('does not show marked state for inactive (before-start) days even if isMarked', () => {
     render(<DayCell date={new Date(2026, 2, 1)} isToday={false} isBeforeStart={true} isFuture={false} isMarked={true} />);
     const cell = screen.getByRole('gridcell');
     expect(cell.className).toContain('bg-surface');
-    expect(cell.className).not.toContain('bg-pink-500');
+    expect(cell.className).not.toContain('bg-pink-marked');
   });
 
   it('applies isMutating styling (opacity and pointer-events-none)', () => {
@@ -142,12 +142,12 @@ describe('DayCell', () => {
   it('applies hover:bg-pink-600 to marked cell when onClick is present', () => {
     const onClick = vi.fn();
     render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} onClick={onClick} />);
-    expect(screen.getByRole('gridcell').className).toContain('hover:bg-pink-600');
+    expect(screen.getByRole('gridcell').className).toContain('hover:bg-pink-300');
   });
 
   it('does not apply hover:bg-pink-600 to marked cell without onClick', () => {
     render(<DayCell date={new Date(2026, 2, 10)} isToday={false} isBeforeStart={false} isFuture={false} isMarked={true} />);
-    expect(screen.getByRole('gridcell').className).not.toContain('hover:bg-pink-600');
+    expect(screen.getByRole('gridcell').className).not.toContain('hover:bg-pink-300');
   });
 
   it('applies hover:bg-pink-100 to today unmarked cell when onClick is present', () => {

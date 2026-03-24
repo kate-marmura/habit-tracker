@@ -55,7 +55,7 @@ const mockHabit: Habit = {
   id: 'abc-123',
   name: 'Exercise',
   description: 'Daily workout',
-  startDate: '2026-03-01',
+  startDate: '2026-01-01',
   isArchived: false,
   createdAt: '2026-03-01T12:00:00.000Z',
   updatedAt: '2026-03-01T12:00:00.000Z',
@@ -151,7 +151,7 @@ describe('HabitCalendarPage', () => {
 
     expect(await screen.findByText('Exercise')).toBeInTheDocument();
     expect(screen.getByText('Daily workout')).toBeInTheDocument();
-    expect(screen.getByText(/started 2026-03-01/i)).toBeInTheDocument();
+    expect(screen.getByText(/started 1 january 2026/i)).toBeInTheDocument();
   });
 
   it('renders CalendarGrid when habit loads successfully', async () => {
@@ -295,7 +295,7 @@ describe('HabitCalendarPage', () => {
     await user.click(screen.getByRole('menuitem', { name: /edit/i }));
 
     expect(screen.getByText(/start date:/i)).toBeInTheDocument();
-    expect(screen.getByText('2026-03-01')).toBeInTheDocument();
+    expect(screen.getByText('1 January 2026')).toBeInTheDocument();
   });
 
   it('shows Archive option in settings dropdown for active habit', async () => {
@@ -529,7 +529,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      const markedCells = cells.filter((c) => c.className.includes('bg-pink-500'));
+      const markedCells = cells.filter((c) => c.className.includes('bg-pink-marked'));
       expect(markedCells.length).toBeGreaterThanOrEqual(2);
     });
   });
@@ -566,7 +566,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const updatedCells = screen.getAllByRole('gridcell');
-      expect(updatedCells[9].className).toContain('bg-pink-500');
+      expect(updatedCells[9].className).toContain('bg-pink-marked');
     });
 
     expect(vi.mocked(createEntry)).toHaveBeenCalledWith(
@@ -607,7 +607,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     const cells = screen.getAllByRole('gridcell');
@@ -615,7 +615,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const updatedCells = screen.getAllByRole('gridcell');
-      expect(updatedCells[9].className).not.toContain('bg-pink-500');
+      expect(updatedCells[9].className).not.toContain('bg-pink-marked');
     });
 
     vi.useRealTimers();
@@ -633,7 +633,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     await user.click(screen.getAllByRole('gridcell')[9]);
@@ -656,7 +656,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     await user.click(screen.getAllByRole('gridcell')[9]);
@@ -666,7 +666,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const updatedCells = screen.getAllByRole('gridcell');
-      expect(updatedCells[9].className).toContain('bg-pink-500');
+      expect(updatedCells[9].className).toContain('bg-pink-marked');
     });
 
     expect(vi.mocked(deleteEntry)).not.toHaveBeenCalled();
@@ -687,7 +687,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     await user.click(screen.getAllByRole('gridcell')[9]);
@@ -715,7 +715,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     await user.click(screen.getAllByRole('gridcell')[9]);
@@ -727,7 +727,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const updatedCells = screen.getAllByRole('gridcell');
-      expect(updatedCells[9].className).toContain('bg-pink-500');
+      expect(updatedCells[9].className).toContain('bg-pink-marked');
     });
 
     vi.useRealTimers();
@@ -782,6 +782,22 @@ describe('HabitCalendarPage', () => {
 
     const nextBtn = screen.getByRole('button', { name: 'Next month' });
     expect(nextBtn).toBeDisabled();
+  });
+
+  it('disables previous month when viewing the habit start month', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 20) });
+    const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
+    vi.mocked(fetchHabitById).mockResolvedValueOnce({
+      ...mockHabit,
+      startDate: '2026-03-01',
+    });
+    vi.mocked(fetchEntries).mockResolvedValue([]);
+
+    renderPage();
+    await screen.findByText('Exercise');
+
+    expect(screen.getByRole('button', { name: 'Previous month' })).toBeDisabled();
+    vi.useRealTimers();
   });
 
   it('navigating to a different month and back preserves habit name', async () => {
@@ -840,7 +856,7 @@ describe('HabitCalendarPage', () => {
 
     await vi.waitFor(() => {
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[9].className).toContain('bg-pink-500');
+      expect(cells[9].className).toContain('bg-pink-marked');
     });
 
     await user.click(screen.getAllByRole('gridcell')[9]);

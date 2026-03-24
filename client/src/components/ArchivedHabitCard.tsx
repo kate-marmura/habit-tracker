@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Eye, ArchiveRestore, Trash2 } from 'lucide-react';
 import type { Habit } from '../types/habit';
+import { formatDate } from '../utils/formatDate';
 
 interface Props {
   habit: Habit;
@@ -27,7 +28,7 @@ export default function ArchivedHabitCard({ habit, onUnarchive, onDelete }: Prop
         {habit.description && (
           <p className="text-sm text-muted mt-1">{habit.description}</p>
         )}
-        <p className="text-xs text-muted mt-2">Started {habit.startDate}</p>
+        <p className="text-xs text-muted mt-2">Started {formatDate(habit.startDate)}</p>
       </div>
       <div className="flex items-center gap-1 shrink-0 pt-0.5">
         <Link

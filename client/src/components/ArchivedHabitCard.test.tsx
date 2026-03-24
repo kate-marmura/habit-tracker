@@ -51,7 +51,7 @@ describe('ArchivedHabitCard', () => {
 
   it('shows start date', () => {
     renderCard();
-    expect(screen.getByText(/started 2025-06-01/i)).toBeInTheDocument();
+    expect(screen.getByText(/started 1 june 2025/i)).toBeInTheDocument();
   });
 
   it('hides description when null', () => {

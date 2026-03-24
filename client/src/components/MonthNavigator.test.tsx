@@ -4,14 +4,32 @@ import MonthNavigator from './MonthNavigator';
 
 describe('MonthNavigator', () => {
   it('renders month/year label in "Month YYYY" format', () => {
-    render(<MonthNavigator year={2026} month={3} onPrev={vi.fn()} onNext={vi.fn()} canGoNext={true} />);
+    render(
+      <MonthNavigator
+        year={2026}
+        month={3}
+        onPrev={vi.fn()}
+        onNext={vi.fn()}
+        canGoPrev={true}
+        canGoNext={true}
+      />,
+    );
     expect(screen.getByText('March 2026')).toBeInTheDocument();
   });
 
   it('previous button has correct aria-label and calls onPrev', async () => {
     const onPrev = vi.fn();
     const user = userEvent.setup();
-    render(<MonthNavigator year={2026} month={3} onPrev={onPrev} onNext={vi.fn()} canGoNext={true} />);
+    render(
+      <MonthNavigator
+        year={2026}
+        month={3}
+        onPrev={onPrev}
+        onNext={vi.fn()}
+        canGoPrev={true}
+        canGoNext={true}
+      />,
+    );
 
     const btn = screen.getByRole('button', { name: 'Previous month' });
     await user.click(btn);
@@ -21,17 +39,56 @@ describe('MonthNavigator', () => {
   it('next button has correct aria-label and calls onNext', async () => {
     const onNext = vi.fn();
     const user = userEvent.setup();
-    render(<MonthNavigator year={2026} month={3} onPrev={vi.fn()} onNext={onNext} canGoNext={true} />);
+    render(
+      <MonthNavigator
+        year={2026}
+        month={3}
+        onPrev={vi.fn()}
+        onNext={onNext}
+        canGoPrev={true}
+        canGoNext={true}
+      />,
+    );
 
     const btn = screen.getByRole('button', { name: 'Next month' });
     await user.click(btn);
     expect(onNext).toHaveBeenCalledTimes(1);
   });
 
+  it('previous button is disabled and does NOT call onPrev when canGoPrev is false', async () => {
+    const onPrev = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MonthNavigator
+        year={2026}
+        month={3}
+        onPrev={onPrev}
+        onNext={vi.fn()}
+        canGoPrev={false}
+        canGoNext={true}
+      />,
+    );
+
+    const btn = screen.getByRole('button', { name: 'Previous month' });
+    expect(btn).toBeDisabled();
+    expect(btn.className).toContain('opacity-50');
+    await user.click(btn);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
   it('next button is disabled and does NOT call onNext when canGoNext is false', async () => {
     const onNext = vi.fn();
     const user = userEvent.setup();
-    render(<MonthNavigator year={2026} month={3} onPrev={vi.fn()} onNext={onNext} canGoNext={false} />);
+    render(
+      <MonthNavigator
+        year={2026}
+        month={3}
+        onPrev={vi.fn()}
+        onNext={onNext}
+        canGoPrev={true}
+        canGoNext={false}
+      />,
+    );
 
     const btn = screen.getByRole('button', { name: 'Next month' });
     expect(btn).toBeDisabled();
@@ -41,10 +98,28 @@ describe('MonthNavigator', () => {
   });
 
   it('label updates when props change', () => {
-    const { rerender } = render(<MonthNavigator year={2026} month={1} onPrev={vi.fn()} onNext={vi.fn()} canGoNext={true} />);
+    const { rerender } = render(
+      <MonthNavigator
+        year={2026}
+        month={1}
+        onPrev={vi.fn()}
+        onNext={vi.fn()}
+        canGoPrev={true}
+        canGoNext={true}
+      />,
+    );
     expect(screen.getByText('January 2026')).toBeInTheDocument();
 
-    rerender(<MonthNavigator year={2025} month={12} onPrev={vi.fn()} onNext={vi.fn()} canGoNext={true} />);
+    rerender(
+      <MonthNavigator
+        year={2025}
+        month={12}
+        onPrev={vi.fn()}
+        onNext={vi.fn()}
+        canGoPrev={true}
+        canGoNext={true}
+      />,
+    );
     expect(screen.getByText('December 2025')).toBeInTheDocument();
   });
 });

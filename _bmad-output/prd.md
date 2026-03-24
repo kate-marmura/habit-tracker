@@ -216,8 +216,11 @@ Habit Tracker is a Single Page Application (SPA) optimized for simplicity and fa
   - **Secondary/neutral:** Grey tones for borders, disabled states, and subtle UI elements
 - **Tone:** Soft, warm, and motivating -- the pink accent should feel encouraging, not aggressive
 - **Typography:** Clean sans-serif, generous whitespace, clear hierarchy
-- **Calendar marked days:** Pink fill or pink checkmark -- the most visually prominent element on the page
+- **Calendar marked days:** Soft pastel pink (`#F3D0D7`) fill with dark pink checkmark -- visually prominent yet calming; the most important element on the page
 - **Calendar unmarked days:** Neutral white/light grey -- no negative indicators (aligns with FR18)
+- **Destructive actions (archive, delete):** Pink tones from the app palette, not red -- keeps the app feeling warm and intentional rather than aggressive
+- **Date display format:** All user-visible dates use `dd MMMM yyyy` (e.g., "24 March 2026") for human readability
+- **App subtitle:** "Let's start a better life" appears below the "Habit Tracker" title in grey, providing a welcoming tone
 
 ### Responsive Design
 

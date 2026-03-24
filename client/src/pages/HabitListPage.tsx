@@ -85,7 +85,10 @@ export default function HabitListPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-pink-500">Habit Tracker</h1>
+          <div>
+            <h1 className="text-xl font-bold text-pink-500">Habit Tracker</h1>
+            <p className="text-muted text-sm">Let&apos;s start a better life</p>
+          </div>
           <div className="flex gap-3">
             <Link
               to="/habits/archived"

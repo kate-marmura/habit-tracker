@@ -84,7 +84,7 @@ export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive, 
                 setOpen(false);
                 onArchive();
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition first:rounded-t-lg last:rounded-b-lg"
+              className="w-full text-left px-4 py-2.5 text-sm text-pink-600 hover:bg-pink-50 transition first:rounded-t-lg last:rounded-b-lg"
             >
               Archive
             </button>
@@ -97,7 +97,7 @@ export default function HabitSettingsDropdown({ onEdit, onArchive, onUnarchive, 
                 setOpen(false);
                 onDelete();
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition first:rounded-t-lg last:rounded-b-lg"
+              className="w-full text-left px-4 py-2.5 text-sm text-pink-600 hover:bg-pink-50 transition first:rounded-t-lg last:rounded-b-lg"
             >
               Delete
             </button>

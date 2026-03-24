@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { ApiError } from '../services/api';
 import { updateHabit } from '../services/habitsApi';
 import type { Habit, UpdateHabitPayload } from '../types/habit';
+import { formatDate } from '../utils/formatDate';
 
 interface Props {
   habit: Habit;
@@ -125,7 +126,7 @@ export default function EditHabitModal({ habit, onClose, onSaved }: Props) {
 
           <div>
             <p className="text-sm text-text-secondary">
-              <span className="font-medium">Start date:</span> {habit.startDate}
+              <span className="font-medium">Start date:</span> {formatDate(habit.startDate)}
             </p>
           </div>
 

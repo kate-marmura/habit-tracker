@@ -59,7 +59,7 @@ export default function DeleteHabitModal({ habit, onClose, onDeleted }: Props) {
         aria-labelledby="delete-habit-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="delete-habit-title" className="text-lg font-semibold text-red-600 mb-2">
+        <h2 id="delete-habit-title" className="text-lg font-semibold text-pink-600 mb-2">
           Permanently delete '{habit.name}'?
         </h2>
         <p className="text-sm text-text-secondary mb-6">
@@ -82,7 +82,7 @@ export default function DeleteHabitModal({ habit, onClose, onDeleted }: Props) {
               type="text"
               value={confirmName}
               onChange={(e) => setConfirmName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
               placeholder={habit.name}
               autoComplete="off"
             />
@@ -99,7 +99,7 @@ export default function DeleteHabitModal({ habit, onClose, onDeleted }: Props) {
             <button
               type="submit"
               disabled={!nameMatches || isSubmitting}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2.5 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-medium py-2.5 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isSubmitting ? 'Deleting...' : 'Delete'}
             </button>

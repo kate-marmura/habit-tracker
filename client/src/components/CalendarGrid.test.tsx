@@ -83,9 +83,9 @@ describe('CalendarGrid', () => {
     render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} />);
 
     const cells = screen.getAllByRole('gridcell');
-    expect(cells[4].className).toContain('bg-pink-500');
-    expect(cells[14].className).toContain('bg-pink-500');
-    expect(cells[5].className).not.toContain('bg-pink-500');
+    expect(cells[4].className).toContain('bg-pink-marked');
+    expect(cells[14].className).toContain('bg-pink-marked');
+    expect(cells[5].className).not.toContain('bg-pink-marked');
   });
 
   it('fires onDayClick with correct date string for eligible unmarked day', async () => {

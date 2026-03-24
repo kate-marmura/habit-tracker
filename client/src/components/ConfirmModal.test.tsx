@@ -115,6 +115,6 @@ describe('ConfirmModal', () => {
     );
 
     const btn = screen.getByRole('button', { name: /delete/i });
-    expect(btn.className).toContain('bg-red-500');
+    expect(btn.className).toContain('bg-pink-500');
   });
 });

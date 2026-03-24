@@ -401,21 +401,29 @@ colors: {
   pink: {
     50:  '#FDF2F8'             // Hover backgrounds, subtle highlights
     100: '#FCE7F3'             // Active nav item background
-    300: '#F9A8D4'             // Secondary buttons, tags
+    marked: '#F3D0D7'          // Marked calendar days — soft pastel pink
+    300: '#F9A8D4'             // Secondary buttons, tags, hover on marked days
     400: '#F472B6'             // Hover states on primary elements
-    500: '#EC4899'             // Primary accent — marked days, CTAs, active states
-    600: '#DB2777'             // Pressed/active button state
-    700: '#BE185D'             // Focus rings
+    500: '#EC4899'             // Primary accent — CTAs, active states, buttons
+    600: '#DB2777'             // Pressed/active button state, destructive action text
+    700: '#BE185D'             // Focus rings, text on marked-day background
   }
 }
 ```
 
 **DayCell visual states using the palette:**
-- **Marked:** Pink-500 fill with white checkmark — the most prominent element
+- **Marked:** Pink-marked (`#F3D0D7`) fill with pink-700 checkmark and text — soft, calming, prominent
 - **Unmarked eligible:** White background, grey-200 border — neutral, no judgment
 - **Today:** Pink-50 background with pink-500 border ring
 - **Before start date / future:** Grey-50 background, grey-300 text — clearly inactive
 - **Hover (eligible):** Pink-50 background transition
+- **Hover (marked):** Pink-300 background transition
+
+**UI conventions:**
+- **Date display format:** All user-facing dates use `dd MMMM yyyy` (e.g., "24 March 2026"). API dates remain `YYYY-MM-DD`.
+- **Destructive action styling:** Archive/delete buttons and text use pink tones (`pink-500`/`pink-600`) instead of red. Actual error messages (validation, network) remain red.
+- **Month navigation limits:** Previous-month disabled when at or before the habit's `startDate` month. Next-month disabled when at the current real-world month.
+- **Date picker:** Custom calendar-style component replaces native `<input type="date">`, matching the app's pink/grey/white design system.
 
 ### Calendar Grid Implementation
 

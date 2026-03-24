@@ -42,7 +42,7 @@ export default function ConfirmModal({
 
   const confirmClasses =
     confirmVariant === 'danger'
-      ? 'bg-red-500 hover:bg-red-600 text-white'
+      ? 'bg-pink-500 hover:bg-pink-600 text-white'
       : 'bg-pink-500 hover:bg-pink-600 text-white';
 
   return (

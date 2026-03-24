@@ -21,11 +21,11 @@ export default function DayCell({ date, isToday, isBeforeStart, isFuture, isMark
   if (inactive) {
     cellClasses += ' bg-surface text-muted cursor-default';
   } else if (isMarked && isToday) {
-    cellClasses += ' bg-pink-500 text-white ring-2 ring-pink-700 font-bold';
-    if (onClick) cellClasses += ' hover:bg-pink-600';
+    cellClasses += ' bg-pink-marked text-pink-700 ring-2 ring-pink-400 font-bold';
+    if (onClick) cellClasses += ' hover:bg-pink-300';
   } else if (isMarked) {
-    cellClasses += ' bg-pink-500 text-white font-bold';
-    if (onClick) cellClasses += ' hover:bg-pink-600';
+    cellClasses += ' bg-pink-marked text-pink-700 font-bold';
+    if (onClick) cellClasses += ' hover:bg-pink-300';
   } else if (isToday) {
     cellClasses += ' bg-pink-50 ring-2 ring-pink-500 text-pink-700';
     if (onClick) cellClasses += ' hover:bg-pink-100';
@@ -53,7 +53,9 @@ export default function DayCell({ date, isToday, isBeforeStart, isFuture, isMark
     >
       <span className="flex items-center gap-0.5">
         {day}
-        {isMarked && !inactive && <Check size={14} strokeWidth={3} aria-hidden="true" />}
+        {isMarked && !inactive && (
+          <Check size={14} strokeWidth={3} className="text-pink-700 shrink-0" aria-hidden="true" />
+        )}
       </span>
     </div>
   );
