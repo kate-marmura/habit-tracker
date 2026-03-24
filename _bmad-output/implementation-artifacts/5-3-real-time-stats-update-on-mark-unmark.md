@@ -173,7 +173,7 @@ feat(stats): real-time stats update on mark/unmark (E5-S3)
 
 ### Agent Model Used
 
-Cursor Composer
+Claude claude-4.6-opus (Cursor Agent)
 
 ### Debug Log References
 

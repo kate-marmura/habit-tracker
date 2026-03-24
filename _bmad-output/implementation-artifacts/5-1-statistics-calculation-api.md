@@ -195,7 +195,7 @@ feat(stats): statistics calculation API endpoint (E5-S1)
 
 ### Agent Model Used
 
-Cursor Composer
+Claude claude-4.6-opus (Cursor Agent)
 
 ### Debug Log References
 
