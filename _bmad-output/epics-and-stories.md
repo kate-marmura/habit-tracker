@@ -16,7 +16,7 @@
 | E4 | Calendar View & Day Marking | 8 | P0 | Calendar grid, tap-to-mark, month navigation, optimistic UI, UI polish |
 | E5 | Progress & Statistics | 3 | P1 | Streak calculation, completion rate, stats panel |
 | E6 | AI Coaching | 4 | Phase 2 | LLM integration, help-me button, graceful degradation (deferred from MVP) |
-| E7 | App Shell & Navigation | 6 | P0 | Layouts, routing, protected routes, responsive nav, desktop layout, UI polish |
+| E7 | App Shell & Navigation | 7 | P0 | Layouts, routing, protected routes, responsive nav, desktop layout, UI polish |
 
 ### Dependency Graph
 
@@ -929,6 +929,21 @@ The following QA practices apply to every feature story, not just this setup sto
 
 ---
 
+### E7-S7: Final UI Polish
+
+**As a** user,
+**I want** a visually consistent experience across all pages,
+**so that** the app feels polished and unified.
+
+**Acceptance Criteria:**
+
+- [ ] ArchivedHabitsPage header and content containers use `max-w-2xl md:max-w-4xl` (matching NavBar and all other pages)
+- [ ] NavBar header background is `bg-pink-50` on all pages (not just habits list and calendar)
+
+**Refs:** Design consistency, Screenshot feedback
+
+---
+
 ## Story Sizing Reference
 
 | Size | Description | Example |
@@ -980,6 +995,7 @@ The following QA practices apply to every feature story, not just this setup sto
 | E7-S4 | S |
 | E7-S5 | M |
 | E7-S6 | M |
+| E7-S7 | S |
 
 ---
 
@@ -1007,6 +1023,7 @@ The following QA practices apply to every feature story, not just this setup sto
 - E7-S2: Responsive Navigation Bar
 - E7-S3: Calendar Page Desktop Two-Column Layout
 - E7-S4: UI Consistency Polish
+- E7-S7: Final UI Polish
 
 ### Sprint 4: Calendar (Core Experience)
 - E4-S1: Calendar Grid Component

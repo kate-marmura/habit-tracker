@@ -63,12 +63,14 @@ describe('NavBar', () => {
     renderNavBar('/habits/archived');
     const link = screen.getByRole('link', { name: /archived/i });
     expect(link.className).toContain('text-pink-500');
+    expect(link.className).toContain('ring-pink-200');
   });
 
   it('highlights Settings link when on /settings', () => {
     renderNavBar('/settings');
     const link = screen.getByRole('link', { name: /settings/i });
     expect(link.className).toContain('text-pink-500');
+    expect(link.className).toContain('ring-pink-200');
   });
 
   it('does not highlight Archived or Settings on /habits', () => {

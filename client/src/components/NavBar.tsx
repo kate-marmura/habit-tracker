@@ -13,8 +13,9 @@ export default function NavBar() {
   const baseCls =
     'flex items-center gap-1 p-2 sm:px-3 sm:py-1.5 rounded-lg transition text-sm font-medium';
   const activeCls = 'bg-pink-50 text-pink-500';
+  const activeContrastCls = 'ring-1 ring-pink-200';
   const inactiveCls = 'text-text-secondary hover:text-pink-500 focus-visible:text-pink-500';
-  const headerCls = `border-b border-border ${isHabits ? 'bg-pink-50' : 'bg-surface'}`;
+  const headerCls = 'border-b border-border bg-pink-50';
 
   return (
     <header className={headerCls}>
@@ -31,7 +32,7 @@ export default function NavBar() {
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             to="/habits/archived"
-            className={`${baseCls} ${isArchived ? activeCls : inactiveCls}`}
+            className={`${baseCls} ${isArchived ? `${activeCls} ${activeContrastCls}` : inactiveCls}`}
             aria-label="Archived"
           >
             <Archive size={20} />
@@ -39,7 +40,7 @@ export default function NavBar() {
           </Link>
           <Link
             to="/settings"
-            className={`${baseCls} ${isSettings ? activeCls : inactiveCls}`}
+            className={`${baseCls} ${isSettings ? `${activeCls} ${activeContrastCls}` : inactiveCls}`}
             aria-label="Settings"
           >
             <SettingsIcon size={20} />

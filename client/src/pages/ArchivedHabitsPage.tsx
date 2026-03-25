@@ -60,7 +60,7 @@ export default function ArchivedHabitsPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-2xl md:max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-pink-500">Archived Habits</h1>
           <Link
             to="/habits"
@@ -73,7 +73,7 @@ export default function ArchivedHabitsPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl md:max-w-4xl mx-auto px-4 py-8">
         {error && (
           <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-4" role="alert">
             {error}
