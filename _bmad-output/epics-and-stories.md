@@ -17,6 +17,7 @@
 | E5 | Progress & Statistics | 3 | P1 | Streak calculation, completion rate, stats panel |
 | E6 | AI Coaching | 4 | Phase 2 | LLM integration, help-me button, graceful degradation (deferred from MVP) |
 | E7 | App Shell & Navigation | 7 | P0 | Layouts, routing, protected routes, responsive nav, desktop layout, UI polish |
+| E8 | Release Confidence & E2E Coverage | 1 | P1 | Core Playwright regression coverage for shipped MVP user flows |
 
 ### Dependency Graph
 
@@ -28,6 +29,8 @@ E1 (Setup) ──► E2 (Auth) ──► E7 (App Shell) ──► E3a (Habits: C
                                                        └──► E3b (Habits: Archive/Unarchive/Delete)
 
 [Phase 2] E4 (Calendar) + E5 (Stats) ──► E6 (AI Coaching)
+
+[Cross-cutting] E2 (Auth) + E3 (Habits) + E4 (Calendar) + E7 (Shell) ──► E8 (E2E Coverage)
 ```
 
 **Note:** E3 is split across sprints. Core habit CRUD (E3-S1 through E3-S3) is needed before Calendar work begins. Archive, unarchive, and delete (E3-S4 through E3-S7) can be completed later since they don't block the calendar experience.
@@ -890,6 +893,36 @@ The following QA practices apply to every feature story, not just this setup sto
 
 ---
 
+## E8: Release Confidence & E2E Coverage
+
+**Goal:** Add a small but meaningful Playwright regression suite for the shipped MVP flows so releases catch critical breakages before they reach users.
+
+### E8-S1: Main E2E User Flows
+
+**As a** team,
+**I want** 5-10 main Playwright end-to-end tests covering the app's core journeys,
+**so that** we have repeatable regression protection for the most important user flows.
+
+**Acceptance Criteria:**
+
+- [ ] `npm run test:e2e` runs a repeatable Playwright suite from the repo root against a full stack that supports the implemented auth and habit flows
+- [ ] The suite contains 5-10 scenario-focused Playwright tests in `e2e/`, with a minimum of 5 passing in a clean local run
+- [ ] Protected-route behavior is covered: unauthenticated access to `/habits` redirects to `/login`
+- [ ] Happy-path authentication is covered with either unique-user registration or login using a known test account, and the user lands on `/habits`
+- [ ] Logout is covered and returns the user to `/login`, with protected routes blocked again until re-authenticated
+- [ ] Habit creation is covered via the real UI, and the new habit appears in the active list and/or opens its calendar page
+- [ ] Calendar interaction is covered by marking today's day and asserting visible calendar or statistics updates
+- [ ] Unmark behavior is covered, including the undo toast path or equivalent visible post-unmark state
+- [ ] Archive and unarchive are covered across `/habits` and `/habits/archived`
+- [ ] Permanent deletion is covered with the required typed-name confirmation step
+- [ ] Tests use stable, user-facing Playwright locators first (`getByRole`, `getByLabel`, text, `aria-label`, existing form ids), not brittle CSS/XPath selectors
+- [ ] Tests are isolated via unique test data and/or cleanup so reruns do not depend on prior database state
+- [ ] The current shallow smoke coverage is replaced by or folded into the new regression suite
+
+**Refs:** E1-S6, FR1-FR24, FR30-FR32, NFR16, NFR17, NFR18, Architecture §13 (Testing Strategy)
+
+---
+
 ### E7-S5: Client-Side Routing Setup
 
 **As a** developer,
@@ -996,6 +1029,7 @@ The following QA practices apply to every feature story, not just this setup sto
 | E7-S5 | M |
 | E7-S6 | M |
 | E7-S7 | S |
+| E8-S1 | L |
 
 ---
 
@@ -1051,3 +1085,6 @@ The following QA practices apply to every feature story, not just this setup sto
 - E2-S6: Reset Password (Complete Reset)
 - E3-S7: Delete a Habit
 - E1-S5: CI Pipeline Setup
+
+### Sprint 8: Release Confidence
+- E8-S1: Main E2E User Flows
