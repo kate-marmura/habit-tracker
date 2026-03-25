@@ -94,3 +94,15 @@ The client runs on `http://localhost:5173` and the server on `http://localhost:3
 | `npm run format:client` | Format client code |
 | `npm run format:server` | Format server code |
 | `npm run test:e2e` | Run E2E tests (placeholder) |
+
+## Screenshots from the app
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 51 34" src="https://github.com/user-attachments/assets/255fd02c-42ea-424f-84e1-33392e9410e2" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 52 31" src="https://github.com/user-attachments/assets/692d72b6-fb74-49cb-9bf2-6fb7ad2983ae" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 52 50" src="https://github.com/user-attachments/assets/6f02e6ee-4149-4a2b-acb9-09b997d45853" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 53 02" src="https://github.com/user-attachments/assets/ebe1f97f-71d7-483d-9275-dae9e8fd1eab" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 53 24" src="https://github.com/user-attachments/assets/ce5a0cbb-4b24-4234-a173-7488e0eb207b" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 53 35" src="https://github.com/user-attachments/assets/e45c953a-3fbd-4305-99c3-a80e65a42f6c" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 53 42" src="https://github.com/user-attachments/assets/7bdcac2c-0cac-4b3e-be66-45c303d63f8f" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 53 46" src="https://github.com/user-attachments/assets/6eb6dced-d9c0-4ad5-b6ec-ca0df50edcb6" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 54 03" src="https://github.com/user-attachments/assets/0fb230b4-130b-4d5a-a292-b246c3cb376f" />
+<img width="1510" height="753" alt="Screenshot 2026-03-25 at 14 54 17" src="https://github.com/user-attachments/assets/a9062fb2-c1ae-45f5-9d34-31fd5cb8aa3a" />
