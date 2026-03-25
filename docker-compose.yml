@@ -56,7 +56,7 @@ services:
       - ./server/src:/app/src
       - ./server/prisma:/app/prisma
       - /app/node_modules
-    command: sh -c "npx prisma migrate deploy && npx tsx watch src/index.ts"
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npx tsx watch src/index.ts"
     depends_on:
       db:
         condition: service_healthy
