@@ -1,4 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  jest,
+} from '@jest/globals';
 import request from 'supertest';
 import bcrypt from 'bcrypt';
 import type { SentMessageInfo } from 'nodemailer';
@@ -15,7 +24,8 @@ const NONEXISTENT_EMAIL = 'nobody@habit-forgot-test.com';
 const TEST_PASSWORD = 'StrongPass1';
 const ALL_EMAILS = [BASIC_EMAIL, TOKEN_EMAIL, REPLACE_EMAIL, RATE_EMAIL];
 
-const NEUTRAL_MESSAGE = 'If an account exists for that email, check your inbox for reset instructions.';
+const NEUTRAL_MESSAGE =
+  'If an account exists for that email, check your inbox for reset instructions.';
 
 let tokenUserId: string;
 let replaceUserId: string;
@@ -57,9 +67,7 @@ describe('POST /api/auth/forgot-password', () => {
   });
 
   it('returns 200 with neutral message for existing email', async () => {
-    const res = await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: BASIC_EMAIL });
+    const res = await request(app).post('/api/auth/forgot-password').send({ email: BASIC_EMAIL });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -83,9 +91,7 @@ describe('POST /api/auth/forgot-password', () => {
   });
 
   it('creates a password_reset_tokens row with hashed token and ~1h expiry', async () => {
-    await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: TOKEN_EMAIL });
+    await request(app).post('/api/auth/forgot-password').send({ email: TOKEN_EMAIL });
 
     const tokens = await prisma.passwordResetToken.findMany({
       where: { userId: tokenUserId },
@@ -109,9 +115,7 @@ describe('POST /api/auth/forgot-password', () => {
   });
 
   it('replaces prior unused token on second request', async () => {
-    await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: REPLACE_EMAIL });
+    await request(app).post('/api/auth/forgot-password').send({ email: REPLACE_EMAIL });
 
     const firstTokens = await prisma.passwordResetToken.findMany({
       where: { userId: replaceUserId },
@@ -119,9 +123,7 @@ describe('POST /api/auth/forgot-password', () => {
     expect(firstTokens).toHaveLength(1);
     const firstHash = firstTokens[0].tokenHash;
 
-    await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: REPLACE_EMAIL });
+    await request(app).post('/api/auth/forgot-password').send({ email: REPLACE_EMAIL });
 
     const secondTokens = await prisma.passwordResetToken.findMany({
       where: { userId: replaceUserId },
@@ -141,24 +143,18 @@ describe('POST /api/auth/forgot-password', () => {
 
   it('returns 429 on the 4th request for the same email', async () => {
     for (let i = 0; i < 3; i++) {
-      const res = await request(app)
-        .post('/api/auth/forgot-password')
-        .send({ email: RATE_EMAIL });
+      const res = await request(app).post('/api/auth/forgot-password').send({ email: RATE_EMAIL });
       expect(res.status).toBe(200);
     }
 
-    const res = await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: RATE_EMAIL });
+    const res = await request(app).post('/api/auth/forgot-password').send({ email: RATE_EMAIL });
 
     expect(res.status).toBe(429);
     expect(res.body.error.code).toBe('RATE_LIMIT_EXCEEDED');
   });
 
   it('does not create a token row for non-existent email', async () => {
-    await request(app)
-      .post('/api/auth/forgot-password')
-      .send({ email: NONEXISTENT_EMAIL });
+    await request(app).post('/api/auth/forgot-password').send({ email: NONEXISTENT_EMAIL });
 
     const tokensForNonexistent = await prisma.passwordResetToken.findMany({
       where: { user: { email: NONEXISTENT_EMAIL } },

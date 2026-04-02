@@ -1,10 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 import { AppError } from '../middleware/error-handler.js';
-import {
-  formatCalendarDate,
-  getTodayInTimezone,
-  parseCalendarDate,
-} from '../lib/calendar-date.js';
+import { formatCalendarDate, getTodayInTimezone, parseCalendarDate } from '../lib/calendar-date.js';
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 

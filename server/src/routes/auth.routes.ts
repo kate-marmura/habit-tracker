@@ -1,8 +1,19 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { commonPasswords } from '../data/common-passwords.js';
-import { register, login, changePassword, requestPasswordReset, resetPassword } from '../services/auth.service.js';
-import { registerLimiter, loginLimiter, forgotPasswordLimiter, resetPasswordLimiter } from '../middleware/rate-limit.middleware.js';
+import {
+  register,
+  login,
+  changePassword,
+  requestPasswordReset,
+  resetPassword,
+} from '../services/auth.service.js';
+import {
+  registerLimiter,
+  loginLimiter,
+  forgotPasswordLimiter,
+  resetPasswordLimiter,
+} from '../middleware/rate-limit.middleware.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
 const passwordSchema = z

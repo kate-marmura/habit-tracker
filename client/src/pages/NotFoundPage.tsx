@@ -8,10 +8,7 @@ export default function NotFoundPage() {
         <p className="text-text-secondary mb-6">
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <Link
-          to="/habits"
-          className="text-pink-500 hover:text-pink-600 font-medium text-sm"
-        >
+        <Link to="/habits" className="text-pink-500 hover:text-pink-600 font-medium text-sm">
           Go to habits
         </Link>
       </main>

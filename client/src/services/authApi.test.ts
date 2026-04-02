@@ -18,7 +18,10 @@ describe('authApi', () => {
 
     const result = await login('a@b.com', 'pass');
 
-    expect(mockPost).toHaveBeenCalledWith('/api/auth/login', { email: 'a@b.com', password: 'pass' });
+    expect(mockPost).toHaveBeenCalledWith('/api/auth/login', {
+      email: 'a@b.com',
+      password: 'pass',
+    });
     expect(result).toEqual(response);
   });
 
@@ -30,7 +33,10 @@ describe('authApi', () => {
 
     const result = await register('a@b.com', 'pass');
 
-    expect(mockPost).toHaveBeenCalledWith('/api/auth/register', { email: 'a@b.com', password: 'pass' });
+    expect(mockPost).toHaveBeenCalledWith('/api/auth/register', {
+      email: 'a@b.com',
+      password: 'pass',
+    });
     expect(result).toEqual(response);
   });
 

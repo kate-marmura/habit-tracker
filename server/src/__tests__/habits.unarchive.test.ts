@@ -116,7 +116,7 @@ describe('PATCH /api/habits/:id/unarchive', () => {
     expect(archived.body.some((h: { id: string }) => h.id === archivedHabitId)).toBe(false);
   });
 
-  it('returns 404 for another user\'s habit', async () => {
+  it("returns 404 for another user's habit", async () => {
     const res = await request(app)
       .patch(`/api/habits/${otherHabitId}/unarchive`)
       .set('Authorization', `Bearer ${validToken}`)

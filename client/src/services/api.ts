@@ -60,11 +60,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
       }
     }
 
-    throw new ApiError(
-      401,
-      code,
-      error?.message || 'Authentication required',
-    );
+    throw new ApiError(401, code, error?.message || 'Authentication required');
   }
 
   if (response.status === 429) {
@@ -84,11 +80,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   );
 }
 
-async function trackedFetch<T>(
-  path: string,
-  method: string,
-  data?: unknown,
-): Promise<T> {
+async function trackedFetch<T>(path: string, method: string, data?: unknown): Promise<T> {
   const controller = new AbortController();
   activeControllers.add(controller);
 

@@ -38,12 +38,46 @@ beforeAll(async () => {
   const now = new Date();
   await prisma.habit.createMany({
     data: [
-      { userId: testUserId, name: 'Active Older', startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: false, createdAt: new Date(now.getTime() - 3000) },
-      { userId: testUserId, name: 'Active Newer', startDate: new Date(Date.UTC(2026, 0, 2)), isArchived: false, createdAt: new Date(now.getTime() - 1000) },
-      { userId: testUserId, name: 'Archived Older', startDate: new Date(Date.UTC(2026, 0, 3)), isArchived: true, createdAt: new Date(now.getTime() - 2000) },
-      { userId: testUserId, name: 'Archived Newer', startDate: new Date(Date.UTC(2026, 0, 4)), isArchived: true, createdAt: new Date(now.getTime() - 500) },
-      { userId: otherUserId, name: 'Other User Active', startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: false },
-      { userId: otherUserId, name: 'Other User Archived', startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: true },
+      {
+        userId: testUserId,
+        name: 'Active Older',
+        startDate: new Date(Date.UTC(2026, 0, 1)),
+        isArchived: false,
+        createdAt: new Date(now.getTime() - 3000),
+      },
+      {
+        userId: testUserId,
+        name: 'Active Newer',
+        startDate: new Date(Date.UTC(2026, 0, 2)),
+        isArchived: false,
+        createdAt: new Date(now.getTime() - 1000),
+      },
+      {
+        userId: testUserId,
+        name: 'Archived Older',
+        startDate: new Date(Date.UTC(2026, 0, 3)),
+        isArchived: true,
+        createdAt: new Date(now.getTime() - 2000),
+      },
+      {
+        userId: testUserId,
+        name: 'Archived Newer',
+        startDate: new Date(Date.UTC(2026, 0, 4)),
+        isArchived: true,
+        createdAt: new Date(now.getTime() - 500),
+      },
+      {
+        userId: otherUserId,
+        name: 'Other User Active',
+        startDate: new Date(Date.UTC(2026, 0, 1)),
+        isArchived: false,
+      },
+      {
+        userId: otherUserId,
+        name: 'Other User Archived',
+        startDate: new Date(Date.UTC(2026, 0, 1)),
+        isArchived: true,
+      },
     ],
   });
 });
@@ -102,9 +136,7 @@ describe('GET /api/habits (active)', () => {
   });
 
   it('returns 401 without authorization', async () => {
-    const res = await request(app)
-      .get('/api/habits')
-      .set('X-Timezone', TZ);
+    const res = await request(app).get('/api/habits').set('X-Timezone', TZ);
 
     expect(res.status).toBe(401);
   });
@@ -172,9 +204,7 @@ describe('GET /api/habits/archived', () => {
   });
 
   it('returns 401 without authorization', async () => {
-    const res = await request(app)
-      .get('/api/habits/archived')
-      .set('X-Timezone', TZ);
+    const res = await request(app).get('/api/habits/archived').set('X-Timezone', TZ);
 
     expect(res.status).toBe(401);
   });

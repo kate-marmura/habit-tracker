@@ -25,7 +25,9 @@ function signToken(userId: string): string {
 }
 
 beforeAll(async () => {
-  await prisma.dayEntry.deleteMany({ where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } } });
+  await prisma.dayEntry.deleteMany({
+    where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } },
+  });
   await prisma.habit.deleteMany({ where: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } });
   await prisma.user.deleteMany({ where: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } });
 
@@ -50,7 +52,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await prisma.dayEntry.deleteMany({ where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } } });
+  await prisma.dayEntry.deleteMany({
+    where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } },
+  });
   await prisma.habit.deleteMany({ where: { userId: { in: [testUserId, otherUserId] } } });
   await prisma.user.deleteMany({ where: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } });
   await prisma.$disconnect();
@@ -104,7 +108,12 @@ describe('DELETE /api/habits/:id', () => {
 
   it('deletes an active habit', async () => {
     const habit = await prisma.habit.create({
-      data: { userId: testUserId, name: 'Active', startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: false },
+      data: {
+        userId: testUserId,
+        name: 'Active',
+        startDate: new Date(Date.UTC(2026, 0, 1)),
+        isArchived: false,
+      },
     });
 
     const res = await request(app)
@@ -117,7 +126,12 @@ describe('DELETE /api/habits/:id', () => {
 
   it('deletes an archived habit', async () => {
     const habit = await prisma.habit.create({
-      data: { userId: testUserId, name: 'Archived', startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: true },
+      data: {
+        userId: testUserId,
+        name: 'Archived',
+        startDate: new Date(Date.UTC(2026, 0, 1)),
+        isArchived: true,
+      },
     });
 
     const res = await request(app)
@@ -129,7 +143,7 @@ describe('DELETE /api/habits/:id', () => {
     expect(res.body).toEqual({ deleted: true });
   });
 
-  it('returns 404 for another user\'s habit', async () => {
+  it("returns 404 for another user's habit", async () => {
     const res = await request(app)
       .delete(`/api/habits/${otherHabitId}`)
       .set('Authorization', `Bearer ${validToken}`)
@@ -163,9 +177,7 @@ describe('DELETE /api/habits/:id', () => {
       data: { userId: testUserId, name: 'No Auth', startDate: new Date(Date.UTC(2026, 0, 1)) },
     });
 
-    const res = await request(app)
-      .delete(`/api/habits/${habit.id}`)
-      .set('X-Timezone', TZ);
+    const res = await request(app).delete(`/api/habits/${habit.id}`).set('X-Timezone', TZ);
 
     expect(res.status).toBe(401);
   });
@@ -176,7 +188,12 @@ describe('DELETE /api/habits/:id', () => {
     const habits = [];
     for (let i = 0; i < 10; i++) {
       const h = await prisma.habit.create({
-        data: { userId: testUserId, name: `Active ${i}`, startDate: new Date(Date.UTC(2026, 0, 1)), isArchived: false },
+        data: {
+          userId: testUserId,
+          name: `Active ${i}`,
+          startDate: new Date(Date.UTC(2026, 0, 1)),
+          isArchived: false,
+        },
       });
       habits.push(h);
     }

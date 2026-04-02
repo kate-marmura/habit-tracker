@@ -25,7 +25,9 @@ describe('ErrorToast', () => {
     render(<ErrorToast message="Error" onDismiss={onDismiss} />);
 
     expect(onDismiss).not.toHaveBeenCalled();
-    act(() => { vi.advanceTimersByTime(3000); });
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 

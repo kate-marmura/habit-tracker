@@ -75,9 +75,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('returns 422 for missing password', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: TEST_EMAIL });
+    const res = await request(app).post('/api/auth/login').send({ email: TEST_EMAIL });
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');

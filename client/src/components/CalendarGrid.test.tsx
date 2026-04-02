@@ -24,7 +24,9 @@ describe('CalendarGrid', () => {
 
   it('leading empty cells align first day correctly for March 2026 (starts on Sunday)', () => {
     // March 1, 2026 is a Sunday → getDay() = 0 → 0 leading blanks
-    const { container } = render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" />);
+    const { container } = render(
+      <CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" />,
+    );
     const gridRows = container.querySelectorAll('[role="row"]');
     const dayGrid = gridRows[1];
     // First child should be a gridcell (day 1), not a blank
@@ -34,7 +36,9 @@ describe('CalendarGrid', () => {
 
   it('leading empty cells align first day correctly for April 2026 (starts on Wednesday)', () => {
     // April 1, 2026 is a Wednesday → getDay() = 3 → 3 leading blanks
-    const { container } = render(<CalendarGrid year={2026} month={4} habitStartDate="2026-03-01" />);
+    const { container } = render(
+      <CalendarGrid year={2026} month={4} habitStartDate="2026-03-01" />,
+    );
     const gridRows = container.querySelectorAll('[role="row"]');
     const dayGrid = gridRows[1];
     const children = Array.from(dayGrid.children);
@@ -72,7 +76,9 @@ describe('CalendarGrid', () => {
   });
 
   it('uses CSS grid with 7 columns', () => {
-    const { container } = render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" />);
+    const { container } = render(
+      <CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" />,
+    );
     const gridRows = container.querySelectorAll('[role="row"]');
     expect(gridRows[0].className).toContain('grid-cols-7');
     expect(gridRows[1].className).toContain('grid-cols-7');
@@ -80,7 +86,9 @@ describe('CalendarGrid', () => {
 
   it('passes markedDates to DayCell — marked days get pink-500 styling', () => {
     const markedDates = new Set(['2026-03-05', '2026-03-15']);
-    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} />);
+    render(
+      <CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     expect(cells[4].className).toContain('bg-pink-marked');
@@ -91,7 +99,9 @@ describe('CalendarGrid', () => {
   it('fires onDayClick with correct date string for eligible unmarked day', async () => {
     const onDayClick = vi.fn();
     const user = userEvent.setup();
-    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" onDayClick={onDayClick} />);
+    render(
+      <CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" onDayClick={onDayClick} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     // Day 10 is index 9 (0-based)
@@ -103,7 +113,15 @@ describe('CalendarGrid', () => {
     const onDayClick = vi.fn();
     const markedDates = new Set(['2026-03-10']);
     const user = userEvent.setup();
-    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" markedDates={markedDates} onDayClick={onDayClick} />);
+    render(
+      <CalendarGrid
+        year={2026}
+        month={3}
+        habitStartDate="2026-03-01"
+        markedDates={markedDates}
+        onDayClick={onDayClick}
+      />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     await user.click(cells[9]);
@@ -112,7 +130,14 @@ describe('CalendarGrid', () => {
 
   it('passes pendingDates — mutating cells have opacity-60', () => {
     const pendingDates = new Set(['2026-03-10']);
-    render(<CalendarGrid year={2026} month={3} habitStartDate="2026-03-01" pendingDates={pendingDates} />);
+    render(
+      <CalendarGrid
+        year={2026}
+        month={3}
+        habitStartDate="2026-03-01"
+        pendingDates={pendingDates}
+      />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     expect(cells[9].className).toContain('opacity-60');

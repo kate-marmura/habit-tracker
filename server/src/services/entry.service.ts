@@ -1,11 +1,7 @@
 import { Prisma } from '../generated/prisma/client.js';
 import { prisma } from '../lib/prisma.js';
 import { AppError } from '../middleware/error-handler.js';
-import {
-  formatCalendarDate,
-  parseCalendarDate,
-  getTodayInTimezone,
-} from '../lib/calendar-date.js';
+import { formatCalendarDate, parseCalendarDate, getTodayInTimezone } from '../lib/calendar-date.js';
 
 export async function listEntriesByMonth(userId: string, habitId: string, month: string) {
   const habit = await prisma.habit.findFirst({

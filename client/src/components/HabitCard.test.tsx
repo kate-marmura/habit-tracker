@@ -14,7 +14,13 @@ const mockHabit: Habit = {
   updatedAt: '2026-03-01T12:00:00.000Z',
 };
 
-function renderCard(props?: Partial<{ onEdit: (h: Habit) => void; onArchive: (h: Habit) => void; onDelete: (h: Habit) => void }>) {
+function renderCard(
+  props?: Partial<{
+    onEdit: (h: Habit) => void;
+    onArchive: (h: Habit) => void;
+    onDelete: (h: Habit) => void;
+  }>,
+) {
   const defaults = {
     onEdit: vi.fn(),
     onArchive: vi.fn(),

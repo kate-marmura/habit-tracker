@@ -106,9 +106,7 @@ describe('DeleteHabitModal', () => {
   it('shows ApiError message inline', async () => {
     const { deleteHabit } = await import('../services/habitsApi');
     const { ApiError } = await import('../services/api');
-    vi.mocked(deleteHabit).mockRejectedValueOnce(
-      new ApiError(404, 'NOT_FOUND', 'Habit not found'),
-    );
+    vi.mocked(deleteHabit).mockRejectedValueOnce(new ApiError(404, 'NOT_FOUND', 'Habit not found'));
 
     const user = userEvent.setup();
     render(<DeleteHabitModal habit={mockHabit} onClose={vi.fn()} onDeleted={vi.fn()} />);

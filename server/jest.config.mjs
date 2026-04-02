@@ -10,10 +10,7 @@ const config = {
   testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
   setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
   transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      { useESM: true, diagnostics: { ignoreCodes: [151002] } },
-    ],
+    '^.+\\.ts$': ['ts-jest', { useESM: true, diagnostics: { ignoreCodes: [151002] } }],
   },
 };
 

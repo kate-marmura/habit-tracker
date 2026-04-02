@@ -113,7 +113,7 @@ describe('PATCH /api/habits/:id/archive', () => {
     expect(archivedIds).toContain(activeHabitId);
   });
 
-  it('returns 404 for another user\'s habit', async () => {
+  it("returns 404 for another user's habit", async () => {
     const res = await request(app)
       .patch(`/api/habits/${otherHabitId}/archive`)
       .set('Authorization', `Bearer ${validToken}`)

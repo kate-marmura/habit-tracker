@@ -61,7 +61,9 @@ describe('LoginPage', () => {
   it('shows error on failed login attempt', async () => {
     const { ApiError } = await import('../services/api');
     const { login } = await import('../services/authApi');
-    vi.mocked(login).mockRejectedValueOnce(new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid email or password'));
+    vi.mocked(login).mockRejectedValueOnce(
+      new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid email or password'),
+    );
 
     const user = userEvent.setup();
     renderLogin();

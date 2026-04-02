@@ -93,7 +93,10 @@ export default function SettingsPage() {
           <p className="mt-2 text-text-secondary">Manage your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6"
+        >
           <h2 className="text-lg font-semibold text-text">Change Password</h2>
 
           {error && (
@@ -119,7 +122,8 @@ export default function SettingsPage() {
               value={currentPassword}
               onChange={(e) => {
                 setCurrentPassword(e.target.value);
-                if (fieldErrors.currentPassword) setFieldErrors((prev) => ({ ...prev, currentPassword: undefined }));
+                if (fieldErrors.currentPassword)
+                  setFieldErrors((prev) => ({ ...prev, currentPassword: undefined }));
               }}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
                 fieldErrors.currentPassword ? 'border-red-400' : 'border-border'
@@ -142,7 +146,8 @@ export default function SettingsPage() {
               value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
-                if (fieldErrors.newPassword) setFieldErrors((prev) => ({ ...prev, newPassword: undefined }));
+                if (fieldErrors.newPassword)
+                  setFieldErrors((prev) => ({ ...prev, newPassword: undefined }));
               }}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
                 fieldErrors.newPassword ? 'border-red-400' : 'border-border'
@@ -158,7 +163,10 @@ export default function SettingsPage() {
                 {PASSWORD_RULES.map((rule) => {
                   const passed = rule.test(newPassword);
                   return (
-                    <li key={rule.label} className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}>
+                    <li
+                      key={rule.label}
+                      className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}
+                    >
                       <span>{passed ? '✓' : '○'}</span>
                       {rule.label}
                     </li>
@@ -169,7 +177,10 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-text mb-1">
+            <label
+              htmlFor="confirmNewPassword"
+              className="block text-sm font-medium text-text mb-1"
+            >
               Confirm New Password
             </label>
             <input
@@ -179,7 +190,8 @@ export default function SettingsPage() {
               value={confirmNewPassword}
               onChange={(e) => {
                 setConfirmNewPassword(e.target.value);
-                if (fieldErrors.confirmNewPassword) setFieldErrors((prev) => ({ ...prev, confirmNewPassword: undefined }));
+                if (fieldErrors.confirmNewPassword)
+                  setFieldErrors((prev) => ({ ...prev, confirmNewPassword: undefined }));
               }}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
                 fieldErrors.confirmNewPassword ? 'border-red-400' : 'border-border'

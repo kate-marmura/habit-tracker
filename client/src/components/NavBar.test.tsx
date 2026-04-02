@@ -35,7 +35,10 @@ function renderNavBar(initialPath = '/habits') {
 describe('NavBar', () => {
   it('renders Archived and Settings links and Log out button', () => {
     renderNavBar();
-    expect(screen.getByRole('link', { name: /archived/i })).toHaveAttribute('href', '/habits/archived');
+    expect(screen.getByRole('link', { name: /archived/i })).toHaveAttribute(
+      'href',
+      '/habits/archived',
+    );
     expect(screen.getByRole('link', { name: /settings/i })).toHaveAttribute('href', '/settings');
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
   });
@@ -81,7 +84,9 @@ describe('NavBar', () => {
 
   it('uses pink text for inactive nav hover and focus states', () => {
     renderNavBar('/habits');
-    expect(screen.getByRole('link', { name: /archived/i }).className).toContain('hover:text-pink-500');
+    expect(screen.getByRole('link', { name: /archived/i }).className).toContain(
+      'hover:text-pink-500',
+    );
     expect(screen.getByRole('link', { name: /archived/i }).className).toContain(
       'focus-visible:text-pink-500',
     );

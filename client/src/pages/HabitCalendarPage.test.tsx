@@ -216,7 +216,10 @@ describe('HabitCalendarPage', () => {
     renderPage();
     await screen.findByText('Exercise');
 
-    expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute('href', '/habits');
+    expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute(
+      'href',
+      '/habits',
+    );
   });
 
   it('has back to habits link pointing to /habits/archived for archived habit', async () => {
@@ -226,7 +229,10 @@ describe('HabitCalendarPage', () => {
     renderPage();
     await screen.findByText('Exercise');
 
-    expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute('href', '/habits/archived');
+    expect(screen.getByRole('link', { name: /back to habits/i })).toHaveAttribute(
+      'href',
+      '/habits/archived',
+    );
   });
 
   it('uses responsive two-column grid layout on desktop', async () => {
@@ -673,10 +679,7 @@ describe('HabitCalendarPage', () => {
       expect(updatedCells[9].className).toContain('bg-pink-marked');
     });
 
-    expect(vi.mocked(createEntry)).toHaveBeenCalledWith(
-      'abc-123',
-      '2026-03-10',
-    );
+    expect(vi.mocked(createEntry)).toHaveBeenCalledWith('abc-123', '2026-03-10');
   });
 
   it('shows error toast when mark mutation fails', async () => {
@@ -994,7 +997,8 @@ describe('HabitCalendarPage', () => {
   });
 
   it('marking a day triggers a stats refetch', async () => {
-    const { fetchHabitById, fetchEntries, createEntry, fetchHabitStats } = await import('../services/habitsApi');
+    const { fetchHabitById, fetchEntries, createEntry, fetchHabitStats } =
+      await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries)
       .mockResolvedValueOnce([])
@@ -1030,7 +1034,8 @@ describe('HabitCalendarPage', () => {
 
   it('unmarking a day (after undo expires) triggers a stats refetch', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    const { fetchHabitById, fetchEntries, deleteEntry, fetchHabitStats } = await import('../services/habitsApi');
+    const { fetchHabitById, fetchEntries, deleteEntry, fetchHabitStats } =
+      await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
     vi.mocked(deleteEntry).mockResolvedValue(undefined);

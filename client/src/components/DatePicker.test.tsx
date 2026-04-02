@@ -4,9 +4,7 @@ import DatePicker from './DatePicker';
 
 describe('DatePicker', () => {
   it('renders weekday headers and month label', () => {
-    render(
-      <DatePicker value="2026-03-15" onChange={vi.fn()} maxDate="2026-03-31" />,
-    );
+    render(<DatePicker value="2026-03-15" onChange={vi.fn()} maxDate="2026-03-31" />);
     expect(screen.getByText('March 2026')).toBeInTheDocument();
     expect(screen.getAllByRole('columnheader')).toHaveLength(7);
     expect(screen.getByRole('grid', { name: /choose start date/i })).toBeInTheDocument();

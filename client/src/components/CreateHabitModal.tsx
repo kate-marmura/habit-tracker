@@ -147,13 +147,16 @@ export default function CreateHabitModal({ onClose, onCreated }: Props) {
               value={startDate}
               onChange={(d) => {
                 setStartDate(d);
-                if (fieldErrors.startDate) setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
+                if (fieldErrors.startDate)
+                  setFieldErrors((prev) => ({ ...prev, startDate: undefined }));
               }}
               maxDate={getTodayString()}
               aria-invalid={!!fieldErrors.startDate}
               className={fieldErrors.startDate ? 'border-red-400' : ''}
             />
-            {fieldErrors.startDate && <p className="mt-1 text-sm text-red-600">{fieldErrors.startDate}</p>}
+            {fieldErrors.startDate && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.startDate}</p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-2">

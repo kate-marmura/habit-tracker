@@ -11,7 +11,15 @@ interface Props {
   onClick?: () => void;
 }
 
-export default function DayCell({ date, isToday, isBeforeStart, isFuture, isMarked, isMutating, onClick }: Props) {
+export default function DayCell({
+  date,
+  isToday,
+  isBeforeStart,
+  isFuture,
+  isMarked,
+  isMutating,
+  onClick,
+}: Props) {
   const day = getDate(date);
   const inactive = isBeforeStart || isFuture;
 

@@ -98,15 +98,15 @@ describe('ForgotPasswordPage', () => {
     await user.type(screen.getByLabelText(/email/i), 'test@example.com');
     await user.click(screen.getByRole('button', { name: /send reset link/i }));
 
-    expect(
-      await screen.findByText(/too many password reset emails/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/too many password reset emails/i)).toBeInTheDocument();
   });
 
   it('ignores REQUEST_ABORTED silently', async () => {
     const { ApiError } = await import('../services/api');
     const { forgotPassword } = await import('../services/authApi');
-    vi.mocked(forgotPassword).mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
+    vi.mocked(forgotPassword).mockRejectedValueOnce(
+      new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'),
+    );
 
     const user = userEvent.setup();
     renderPage();

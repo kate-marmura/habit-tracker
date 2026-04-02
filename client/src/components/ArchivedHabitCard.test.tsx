@@ -14,7 +14,9 @@ const mockHabit: Habit = {
   updatedAt: '2026-01-15T12:00:00.000Z',
 };
 
-function renderCard(overrides?: Partial<{ onUnarchive: (h: Habit) => void; onDelete: (h: Habit) => void }>) {
+function renderCard(
+  overrides?: Partial<{ onUnarchive: (h: Habit) => void; onDelete: (h: Habit) => void }>,
+) {
   const defaults = {
     onUnarchive: vi.fn(),
     onDelete: vi.fn(),
@@ -58,7 +60,11 @@ describe('ArchivedHabitCard', () => {
     render(
       <MemoryRouter>
         <ul>
-          <ArchivedHabitCard habit={{ ...mockHabit, description: null }} onUnarchive={vi.fn()} onDelete={vi.fn()} />
+          <ArchivedHabitCard
+            habit={{ ...mockHabit, description: null }}
+            onUnarchive={vi.fn()}
+            onDelete={vi.fn()}
+          />
         </ul>
       </MemoryRouter>,
     );

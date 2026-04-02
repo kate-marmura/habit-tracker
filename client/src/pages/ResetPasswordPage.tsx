@@ -120,7 +120,11 @@ export default function ResetPasswordPage() {
           <p className="mt-2 text-text-secondary">Set a new password</p>
         </div>
 
-        <form noValidate onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+        <form
+          noValidate
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6"
+        >
           {error && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm" role="alert">
               {error}
@@ -138,7 +142,8 @@ export default function ResetPasswordPage() {
               value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
-                if (fieldErrors.newPassword) setFieldErrors((prev) => ({ ...prev, newPassword: undefined }));
+                if (fieldErrors.newPassword)
+                  setFieldErrors((prev) => ({ ...prev, newPassword: undefined }));
               }}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
                 fieldErrors.newPassword ? 'border-red-400' : 'border-border'
@@ -154,7 +159,10 @@ export default function ResetPasswordPage() {
                 {PASSWORD_RULES.map((rule) => {
                   const passed = rule.test(newPassword);
                   return (
-                    <li key={rule.label} className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}>
+                    <li
+                      key={rule.label}
+                      className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}
+                    >
                       <span>{passed ? '✓' : '○'}</span>
                       {rule.label}
                     </li>
@@ -175,7 +183,8 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
-                if (fieldErrors.confirmPassword) setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                if (fieldErrors.confirmPassword)
+                  setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
               }}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
                 fieldErrors.confirmPassword ? 'border-red-400' : 'border-border'

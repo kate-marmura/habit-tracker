@@ -15,8 +15,16 @@ import { getHabitStats } from '../services/stats.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
 export const createHabitSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  description: z.string().trim().max(2000, 'Description must be at most 2000 characters').optional(),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Name is required')
+    .max(100, 'Name must be at most 100 characters'),
+  description: z
+    .string()
+    .trim()
+    .max(2000, 'Description must be at most 2000 characters')
+    .optional(),
   startDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be YYYY-MM-DD')
@@ -24,8 +32,16 @@ export const createHabitSchema = z.object({
 });
 
 export const updateHabitBodySchema = z.object({
-  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  description: z.string().trim().max(2000, 'Description must be at most 2000 characters').optional(),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Name is required')
+    .max(100, 'Name must be at most 100 characters'),
+  description: z
+    .string()
+    .trim()
+    .max(2000, 'Description must be at most 2000 characters')
+    .optional(),
 });
 
 const habitIdParam = z.string().uuid('Invalid habit ID');

@@ -88,7 +88,11 @@ describe('ResetPasswordPage', () => {
     const { ApiError } = await import('../services/api');
     const { resetPassword } = await import('../services/authApi');
     vi.mocked(resetPassword).mockRejectedValueOnce(
-      new ApiError(400, 'INVALID_RESET_TOKEN', 'This password reset link is invalid or has expired'),
+      new ApiError(
+        400,
+        'INVALID_RESET_TOKEN',
+        'This password reset link is invalid or has expired',
+      ),
     );
 
     const user = userEvent.setup();
@@ -106,7 +110,9 @@ describe('ResetPasswordPage', () => {
   it('ignores REQUEST_ABORTED silently', async () => {
     const { ApiError } = await import('../services/api');
     const { resetPassword } = await import('../services/authApi');
-    vi.mocked(resetPassword).mockRejectedValueOnce(new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'));
+    vi.mocked(resetPassword).mockRejectedValueOnce(
+      new ApiError(0, 'REQUEST_ABORTED', 'Request cancelled'),
+    );
 
     const user = userEvent.setup();
     renderPage();

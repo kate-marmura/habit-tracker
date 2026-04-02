@@ -25,7 +25,9 @@ function signToken(userId: string): string {
 }
 
 beforeAll(async () => {
-  await prisma.dayEntry.deleteMany({ where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } } });
+  await prisma.dayEntry.deleteMany({
+    where: { habit: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } },
+  });
   await prisma.habit.deleteMany({ where: { user: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } } });
   await prisma.user.deleteMany({ where: { email: { in: [TEST_EMAIL, OTHER_EMAIL] } } });
 

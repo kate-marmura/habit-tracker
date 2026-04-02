@@ -65,9 +65,7 @@ export default function HabitCalendarPage() {
         : 'Could not load habit. Please check your connection and try again.'
       : null;
 
-  const habitStartDate = habit
-    ? parse(habit.startDate, 'yyyy-MM-dd', new Date())
-    : null;
+  const habitStartDate = habit ? parse(habit.startDate, 'yyyy-MM-dd', new Date()) : null;
   const canGoPrev =
     habitStartDate && isValid(habitStartDate)
       ? calYear > habitStartDate.getFullYear() ||
@@ -121,7 +119,10 @@ export default function HabitCalendarPage() {
     mutationFn: (dateStr: string) => createEntry(id!, dateStr),
     onMutate: async (dateStr) => {
       await queryClient.cancelQueries({ queryKey: entriesQueryKey });
-      queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => new Set([...(old ?? []), dateStr]));
+      queryClient.setQueryData<Set<string>>(
+        entriesQueryKey,
+        (old) => new Set([...(old ?? []), dateStr]),
+      );
       setPendingDates((prev) => new Set([...prev, dateStr]));
     },
     onError: (_err, dateStr) => {
@@ -160,7 +161,10 @@ export default function HabitCalendarPage() {
         queryClient.invalidateQueries({ queryKey: entriesQueryKey });
         queryClient.invalidateQueries({ queryKey: statsQueryKey });
       } catch (err) {
-        queryClient.setQueryData<Set<string>>(entriesQueryKey, (old) => new Set([...(old ?? []), dateStr]));
+        queryClient.setQueryData<Set<string>>(
+          entriesQueryKey,
+          (old) => new Set([...(old ?? []), dateStr]),
+        );
         const msg = err instanceof Error ? err.message : 'Could not unmark day. Please try again.';
         setToastMessage(msg);
       } finally {
@@ -185,15 +189,23 @@ export default function HabitCalendarPage() {
   const goToPrevMonth = useCallback(() => {
     if (!canGoPrev) return;
     commitPendingUndo();
-    if (calMonth === 1) { setCalYear((y) => y - 1); setCalMonth(12); }
-    else { setCalMonth((m) => m - 1); }
+    if (calMonth === 1) {
+      setCalYear((y) => y - 1);
+      setCalMonth(12);
+    } else {
+      setCalMonth((m) => m - 1);
+    }
   }, [calMonth, canGoPrev, commitPendingUndo]);
 
   const goToNextMonth = useCallback(() => {
     if (isCurrentMonth) return;
     commitPendingUndo();
-    if (calMonth === 12) { setCalYear((y) => y + 1); setCalMonth(1); }
-    else { setCalMonth((m) => m + 1); }
+    if (calMonth === 12) {
+      setCalYear((y) => y + 1);
+      setCalMonth(1);
+    } else {
+      setCalMonth((m) => m + 1);
+    }
   }, [calMonth, isCurrentMonth, commitPendingUndo]);
 
   const handleUnmark = useCallback(
@@ -322,7 +334,7 @@ export default function HabitCalendarPage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <h1 className="min-w-0 text-xl font-bold text-pink-500 truncate">
-                {loading ? 'Loading...' : habit?.name ?? 'Habit'}
+                {loading ? 'Loading...' : (habit?.name ?? 'Habit')}
               </h1>
               {habit?.isArchived && (
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-muted shrink-0">
@@ -330,9 +342,7 @@ export default function HabitCalendarPage() {
                 </span>
               )}
             </div>
-            {habit && (
-              <p className="text-xs text-muted">Started {formatDate(habit.startDate)}</p>
-            )}
+            {habit && <p className="text-xs text-muted">Started {formatDate(habit.startDate)}</p>}
           </div>
           <div className="flex items-center gap-3">
             {habit && !habit.isArchived && (
@@ -368,10 +378,7 @@ export default function HabitCalendarPage() {
         ) : error ? (
           <div className="text-center py-16">
             <p className="text-red-600 mb-4">{error}</p>
-            <Link
-              to="/habits"
-              className="text-pink-500 hover:text-pink-600 font-medium text-sm"
-            >
+            <Link to="/habits" className="text-pink-500 hover:text-pink-600 font-medium text-sm">
               Back to habits
             </Link>
           </div>
@@ -382,8 +389,13 @@ export default function HabitCalendarPage() {
                 <p className="text-text-secondary text-sm mb-2">Loading entries...</p>
               )}
               {entriesQuery.isError && (
-                <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3" role="alert">
-                  {entriesQuery.error instanceof Error ? entriesQuery.error.message : 'Could not load entries.'}
+                <div
+                  className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm mb-3"
+                  role="alert"
+                >
+                  {entriesQuery.error instanceof Error
+                    ? entriesQuery.error.message
+                    : 'Could not load entries.'}
                 </div>
               )}
               {habit && (

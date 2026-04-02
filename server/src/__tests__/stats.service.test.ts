@@ -63,7 +63,14 @@ describe('computeLongestStreak', () => {
 
   it('picks max among multiple runs', () => {
     expect(
-      computeLongestStreak(['2026-01-01', '2026-01-02', '2026-02-10', '2026-02-11', '2026-02-12', '2026-02-13']),
+      computeLongestStreak([
+        '2026-01-01',
+        '2026-01-02',
+        '2026-02-10',
+        '2026-02-11',
+        '2026-02-12',
+        '2026-02-13',
+      ]),
     ).toBe(4);
   });
 });
@@ -101,4 +108,3 @@ describe('computeCurrentStreak', () => {
     expect(computeCurrentStreak(set, '2026-03-03', '2026-03-01')).toBe(3);
   });
 });
-

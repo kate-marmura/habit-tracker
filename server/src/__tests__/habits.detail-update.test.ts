@@ -80,7 +80,7 @@ describe('GET /api/habits/:id', () => {
     expect(res.body.updatedAt).toBeDefined();
   });
 
-  it('returns 404 for another user\'s habit', async () => {
+  it("returns 404 for another user's habit", async () => {
     const res = await request(app)
       .get(`/api/habits/${otherHabitId}`)
       .set('Authorization', `Bearer ${validToken}`)
@@ -111,9 +111,7 @@ describe('GET /api/habits/:id', () => {
   });
 
   it('returns 401 without auth', async () => {
-    const res = await request(app)
-      .get(`/api/habits/${testHabitId}`)
-      .set('X-Timezone', TZ);
+    const res = await request(app).get(`/api/habits/${testHabitId}`).set('X-Timezone', TZ);
 
     expect(res.status).toBe(401);
   });
@@ -222,7 +220,7 @@ describe('PUT /api/habits/:id', () => {
     );
   });
 
-  it('returns 404 for another user\'s habit', async () => {
+  it("returns 404 for another user's habit", async () => {
     const res = await request(app)
       .put(`/api/habits/${otherHabitId}`)
       .set('Authorization', `Bearer ${validToken}`)

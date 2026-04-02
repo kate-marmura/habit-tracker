@@ -110,7 +110,10 @@ export default function EditHabitModal({ habit, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label htmlFor="edit-habit-description" className="block text-sm font-medium text-text mb-1">
+            <label
+              htmlFor="edit-habit-description"
+              className="block text-sm font-medium text-text mb-1"
+            >
               Description
             </label>
             <textarea

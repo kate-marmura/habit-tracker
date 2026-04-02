@@ -90,7 +90,11 @@ export default function ForgotPasswordPage() {
           <p className="mt-2 text-text-secondary">Reset your password</p>
         </div>
 
-        <form noValidate onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+        <form
+          noValidate
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6"
+        >
           {error && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm" role="alert">
               {error}

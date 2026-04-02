@@ -74,7 +74,10 @@ export default function DeleteHabitModal({ habit, onClose, onDeleted }: Props) {
           )}
 
           <div>
-            <label htmlFor="delete-confirm-name" className="block text-sm font-medium text-text mb-1">
+            <label
+              htmlFor="delete-confirm-name"
+              className="block text-sm font-medium text-text mb-1"
+            >
               Type the habit name to confirm
             </label>
             <input

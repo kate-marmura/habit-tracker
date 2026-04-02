@@ -85,7 +85,10 @@ export default function LoginPage() {
           <p className="mt-2 text-text-secondary">Welcome back</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6"
+        >
           {locationMessage && (
             <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm" role="status">
               {locationMessage}
@@ -131,7 +134,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                if (fieldErrors.password)
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
               }}
               onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${

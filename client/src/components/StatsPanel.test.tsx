@@ -62,10 +62,7 @@ describe('StatsPanel', () => {
 
   it('uses singular "1 day" for streak value of 1', () => {
     render(
-      <StatsPanel
-        stats={{ ...baseStats, currentStreak: 1, longestStreak: 1 }}
-        isLoading={false}
-      />,
+      <StatsPanel stats={{ ...baseStats, currentStreak: 1, longestStreak: 1 }} isLoading={false} />,
     );
     const oneDayLabels = screen.getAllByText('1 day');
     expect(oneDayLabels).toHaveLength(2);

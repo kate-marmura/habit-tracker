@@ -39,9 +39,7 @@ afterAll(async () => {
 });
 
 function postHabit(body: Record<string, unknown>, token?: string) {
-  const req = request(app)
-    .post('/api/habits')
-    .set('X-Timezone', TZ);
+  const req = request(app).post('/api/habits').set('X-Timezone', TZ);
   if (token !== undefined) {
     req.set('Authorization', `Bearer ${token}`);
   }
@@ -68,10 +66,7 @@ describe('POST /api/habits', () => {
 
   it('stores correct calendar date in DB', async () => {
     const today = getTodayInTimezone(TZ);
-    const res = await postHabit(
-      { name: 'Read', startDate: today },
-      validToken,
-    );
+    const res = await postHabit({ name: 'Read', startDate: today }, validToken);
 
     const dbHabit = await prisma.habit.findUnique({
       where: { id: res.body.id },
@@ -82,20 +77,14 @@ describe('POST /api/habits', () => {
   });
 
   it('returns 422 for future startDate', async () => {
-    const res = await postHabit(
-      { name: 'Future habit', startDate: '2099-12-31' },
-      validToken,
-    );
+    const res = await postHabit({ name: 'Future habit', startDate: '2099-12-31' }, validToken);
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('INVALID_START_DATE');
   });
 
   it('returns 422 for impossible calendar startDate (Zod)', async () => {
-    const res = await postHabit(
-      { name: 'Bad date habit', startDate: '2026-02-30' },
-      validToken,
-    );
+    const res = await postHabit({ name: 'Bad date habit', startDate: '2026-02-30' }, validToken);
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
@@ -103,10 +92,7 @@ describe('POST /api/habits', () => {
 
   it('returns 422 for missing name', async () => {
     const today = getTodayInTimezone(TZ);
-    const res = await postHabit(
-      { name: '', startDate: today },
-      validToken,
-    );
+    const res = await postHabit({ name: '', startDate: today }, validToken);
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
@@ -114,10 +100,7 @@ describe('POST /api/habits', () => {
 
   it('returns 422 for name exceeding 100 characters', async () => {
     const today = getTodayInTimezone(TZ);
-    const res = await postHabit(
-      { name: 'a'.repeat(101), startDate: today },
-      validToken,
-    );
+    const res = await postHabit({ name: 'a'.repeat(101), startDate: today }, validToken);
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
@@ -137,10 +120,7 @@ describe('POST /api/habits', () => {
       });
     }
 
-    const res = await postHabit(
-      { name: 'Overflow habit', startDate: today },
-      validToken,
-    );
+    const res = await postHabit({ name: 'Overflow habit', startDate: today }, validToken);
 
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('HABIT_LIMIT_REACHED');
@@ -157,10 +137,7 @@ describe('POST /api/habits', () => {
 
   it('stores null description when omitted', async () => {
     const today = getTodayInTimezone(TZ);
-    const res = await postHabit(
-      { name: 'No desc', startDate: today },
-      validToken,
-    );
+    const res = await postHabit({ name: 'No desc', startDate: today }, validToken);
 
     expect(res.status).toBe(201);
     expect(res.body.description).toBeNull();

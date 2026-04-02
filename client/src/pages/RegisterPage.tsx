@@ -97,7 +97,10 @@ export default function RegisterPage() {
           <p className="mt-2 text-text-secondary">Create your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-xl shadow-sm border border-border p-8 space-y-6"
+        >
           {error && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm" role="alert">
               {error}
@@ -137,7 +140,8 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                if (fieldErrors.password)
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
               }}
               onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
               className={`w-full px-4 py-2.5 rounded-lg border bg-background text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition ${
@@ -152,7 +156,10 @@ export default function RegisterPage() {
                 {PASSWORD_RULES.map((rule) => {
                   const passed = rule.test(password);
                   return (
-                    <li key={rule.label} className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}>
+                    <li
+                      key={rule.label}
+                      className={`text-xs flex items-center gap-1.5 ${passed ? 'text-green-600' : 'text-muted'}`}
+                    >
                       <span>{passed ? '✓' : '○'}</span>
                       {rule.label}
                     </li>

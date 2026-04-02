@@ -9,7 +9,14 @@ interface Props {
   canGoNext: boolean;
 }
 
-export default function MonthNavigator({ year, month, onPrev, onNext, canGoPrev, canGoNext }: Props) {
+export default function MonthNavigator({
+  year,
+  month,
+  onPrev,
+  onNext,
+  canGoPrev,
+  canGoNext,
+}: Props) {
   const label = new Date(year, month - 1).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -26,9 +33,7 @@ export default function MonthNavigator({ year, month, onPrev, onNext, canGoPrev,
       >
         <ChevronLeft size={20} />
       </button>
-      <span className="text-lg font-semibold text-text min-w-[180px] text-center">
-        {label}
-      </span>
+      <span className="text-lg font-semibold text-text min-w-[180px] text-center">{label}</span>
       <button
         type="button"
         onClick={onNext}

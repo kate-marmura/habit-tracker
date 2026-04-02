@@ -23,7 +23,14 @@ interface Props {
   onDayClick?: (dateStr: string) => void;
 }
 
-export default function CalendarGrid({ year, month, habitStartDate, markedDates, pendingDates, onDayClick }: Props) {
+export default function CalendarGrid({
+  year,
+  month,
+  habitStartDate,
+  markedDates,
+  pendingDates,
+  onDayClick,
+}: Props) {
   const { days, leadingBlanks, startDate } = useMemo(() => {
     const monthDate = new Date(year, month - 1, 1);
     const start = startOfMonth(monthDate);
@@ -38,14 +45,19 @@ export default function CalendarGrid({ year, month, habitStartDate, markedDates,
   const today = startOfDay(new Date());
 
   return (
-    <div role="grid" aria-label={`Calendar for ${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}>
+    <div
+      role="grid"
+      aria-label={`Calendar for ${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+    >
       <div className="grid grid-cols-7 gap-1 mb-1" role="row">
         {WEEKDAY_HEADERS.map((label, i) => (
           <div
             key={i}
             className="text-center text-xs font-semibold text-muted py-1"
             role="columnheader"
-            aria-label={['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i]}
+            aria-label={
+              ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i]
+            }
           >
             {label}
           </div>

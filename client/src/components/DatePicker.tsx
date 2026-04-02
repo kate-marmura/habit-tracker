@@ -42,10 +42,7 @@ export default function DatePicker({
   className = '',
 }: Props) {
   const maxDateStr = maxDateProp ?? todayYmd();
-  const maxD = useMemo(
-    () => startOfDay(parse(maxDateStr, 'yyyy-MM-dd', new Date())),
-    [maxDateStr],
-  );
+  const maxD = useMemo(() => startOfDay(parse(maxDateStr, 'yyyy-MM-dd', new Date())), [maxDateStr]);
 
   const safeValueDate = useMemo(() => {
     const p = parse(value, 'yyyy-MM-dd', new Date());
@@ -60,8 +57,7 @@ export default function DatePicker({
 
   const maxYear = maxD.getFullYear();
   const maxMon = maxD.getMonth() + 1;
-  const canGoNext =
-    viewYear < maxYear || (viewYear === maxYear && viewMonth < maxMon);
+  const canGoNext = viewYear < maxYear || (viewYear === maxYear && viewMonth < maxMon);
 
   const monthStart = useMemo(
     () => startOfMonth(new Date(viewYear, viewMonth - 1, 1)),
@@ -162,14 +158,21 @@ export default function DatePicker({
       >
         <div className="grid grid-cols-7 gap-1 mb-1" role="row">
           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-            <div key={i} className="text-center text-xs font-semibold text-muted py-1" role="columnheader">
+            <div
+              key={i}
+              className="text-center text-xs font-semibold text-muted py-1"
+              role="columnheader"
+            >
               {d}
             </div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1" role="row">
           {Array.from({ length: leadingBlanks }, (_, i) => (
-            <div key={`b-${i}`} className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px]" />
+            <div
+              key={`b-${i}`}
+              className="min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px]"
+            />
           ))}
           {days.map((day) => {
             const ymd = format(day, 'yyyy-MM-dd');

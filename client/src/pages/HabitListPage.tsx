@@ -118,10 +118,7 @@ export default function HabitListPage() {
       </main>
 
       {showCreateModal && (
-        <CreateHabitModal
-          onClose={() => setShowCreateModal(false)}
-          onCreated={handleCreated}
-        />
+        <CreateHabitModal onClose={() => setShowCreateModal(false)} onCreated={handleCreated} />
       )}
 
       {editingHabit && (
