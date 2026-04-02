@@ -23,6 +23,10 @@ server/src/generated/
 .vscode/
 .idea/
 
+# Claude Code
+.claude/settings.local.json
+.claude/worktrees/
+
 # Playwright
 playwright-report/
 test-results/
