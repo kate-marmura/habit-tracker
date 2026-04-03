@@ -114,7 +114,7 @@ export async function updateHabit(userId: string, habitId: string, input: Update
 export async function unarchiveHabit(userId: string, habitId: string) {
   const existing = await prisma.habit.findFirst({
     where: { id: habitId, userId },
-    select: { id: true, isArchived: true },
+    select: habitSelectFields,
   });
 
   if (!existing) {
@@ -122,12 +122,7 @@ export async function unarchiveHabit(userId: string, habitId: string) {
   }
 
   if (!existing.isArchived) {
-    const habit = await prisma.habit.findFirst({
-      where: { id: habitId, userId },
-      select: habitSelectFields,
-    });
-    if (!habit) throw new AppError(404, 'NOT_FOUND', 'Habit not found');
-    return { ...habit, startDate: formatCalendarDate(habit.startDate) };
+    return { ...existing, startDate: formatCalendarDate(existing.startDate) };
   }
 
   const activeCount = await prisma.habit.count({
@@ -165,7 +160,7 @@ export async function deleteHabit(userId: string, habitId: string) {
 export async function archiveHabit(userId: string, habitId: string) {
   const existing = await prisma.habit.findFirst({
     where: { id: habitId, userId },
-    select: { id: true, isArchived: true },
+    select: habitSelectFields,
   });
 
   if (!existing) {
@@ -173,12 +168,7 @@ export async function archiveHabit(userId: string, habitId: string) {
   }
 
   if (existing.isArchived) {
-    const habit = await prisma.habit.findFirst({
-      where: { id: habitId, userId },
-      select: habitSelectFields,
-    });
-    if (!habit) throw new AppError(404, 'NOT_FOUND', 'Habit not found');
-    return { ...habit, startDate: formatCalendarDate(habit.startDate) };
+    return { ...existing, startDate: formatCalendarDate(existing.startDate) };
   }
 
   const habit = await prisma.habit.update({

@@ -44,9 +44,9 @@ export default function HabitCalendarPage() {
   const [pendingDates, setPendingDates] = useState<Set<string>>(new Set());
   const undoStateRef = useRef<UndoState | null>(null);
 
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth() + 1);
   const now = new Date();
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const [calMonth, setCalMonth] = useState(now.getMonth() + 1);
   const isCurrentMonth = calYear === now.getFullYear() && calMonth === now.getMonth() + 1;
 
   const validId = !!id?.trim();
@@ -287,17 +287,26 @@ export default function HabitCalendarPage() {
 
   async function handleArchiveConfirm() {
     if (!id || !habit) return;
-    const archivedHabit = await archiveHabit(id);
-    queryClient.setQueryData(['habit', id], archivedHabit);
-    queryClient.setQueryData<Habit[]>(['habits'], (old) =>
-      old?.filter((item) => item.id !== archivedHabit.id),
-    );
-    queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
-      old ? [archivedHabit, ...old.filter((item) => item.id !== archivedHabit.id)] : old,
-    );
-    void queryClient.invalidateQueries({ queryKey: ['habits'] });
-    void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
-    navigate('/habits', { replace: true });
+    try {
+      const archivedHabit = await archiveHabit(id);
+      queryClient.setQueryData(['habit', id], archivedHabit);
+      queryClient.setQueryData<Habit[]>(['habits'], (old) =>
+        old?.filter((item) => item.id !== archivedHabit.id),
+      );
+      queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
+        old ? [archivedHabit, ...old.filter((item) => item.id !== archivedHabit.id)] : old,
+      );
+      void queryClient.invalidateQueries({ queryKey: ['habits'] });
+      void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
+      navigate('/habits', { replace: true });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'REQUEST_ABORTED') return;
+        setToastMessage(err.message);
+      } else {
+        setToastMessage('Could not archive habit. Please check your connection and try again.');
+      }
+    }
   }
 
   async function handleUnarchive() {
