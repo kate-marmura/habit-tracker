@@ -244,6 +244,35 @@ server/src/__tests__/habit.routes.test.ts
 
 ---
 
+### Rule 9 — Pin system time in tests that depend on the current date
+
+Any test that renders a component or calls a function whose behaviour depends on `new Date()` must pin the system clock with `vi.useFakeTimers({ now: new Date(...), shouldAdvanceTime: true })`. Tests that rely on the real clock become time bombs — they pass today and fail silently when the month or year rolls over.
+
+Always call `vi.useRealTimers()` in `afterEach` (or at the end of the test) to prevent timer state from leaking into subsequent tests.
+
+```ts
+// Before — breaks when the calendar month advances
+it('displays marked dates', async () => {
+  vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+  renderPage(); // component defaults to new Date() → April → March entry never shown
+  await vi.waitFor(() => expect(cells[9].className).toContain('bg-pink-marked')); // fails
+});
+
+// After — pinned to the month the test data lives in
+it('displays marked dates', async () => {
+  vi.useFakeTimers({ now: new Date(2026, 2, 15), shouldAdvanceTime: true });
+  vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
+  renderPage(); // component defaults to March 2026 ✓
+  await vi.waitFor(() => expect(cells[9].className).toContain('bg-pink-marked'));
+});
+
+afterEach(() => {
+  vi.useRealTimers(); // always clean up — prevents timer leakage between tests
+});
+```
+
+---
+
 ## Key Docs
 
 | Document | Location |
