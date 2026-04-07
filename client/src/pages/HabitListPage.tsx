@@ -30,6 +30,7 @@ export default function HabitListPage() {
 
   function handleCreated(habit: Habit) {
     queryClient.setQueryData<Habit[]>(['habits'], (old) => [habit, ...(old ?? [])]);
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
     setShowCreateModal(false);
   }
 
@@ -37,6 +38,7 @@ export default function HabitListPage() {
     queryClient.setQueryData<Habit[]>(['habits'], (old) =>
       old?.map((h) => (h.id === updated.id ? updated : h)),
     );
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
     setEditingHabit(null);
   }
 
@@ -59,6 +61,7 @@ export default function HabitListPage() {
     queryClient.setQueryData<Habit[]>(['habits'], (old) =>
       old?.filter((h) => h.id !== deletingHabit.id),
     );
+    void queryClient.invalidateQueries({ queryKey: ['habits'] });
     setDeletingHabit(null);
   }
 

@@ -54,6 +54,7 @@ export default function ArchivedHabitsPage() {
     queryClient.setQueryData<Habit[]>(['archivedHabits'], (old) =>
       old?.filter((h) => h.id !== deletingHabit.id),
     );
+    void queryClient.invalidateQueries({ queryKey: ['archivedHabits'] });
     setDeletingHabit(null);
   }
 

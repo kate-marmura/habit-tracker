@@ -4,9 +4,9 @@ import { authenticate } from '../middleware/auth.middleware.js';
 import { listEntriesByMonth, createEntry, deleteEntry } from '../services/entry.service.js';
 import { isValidCalendarDateString } from '../lib/calendar-date.js';
 
-const habitIdParam = z.string().uuid('Invalid habit ID');
+export const habitIdParam = z.string().uuid('Invalid habit ID');
 
-const monthQuery = z
+export const monthQuery = z
   .string()
   .regex(/^\d{4}-\d{2}$/, 'Month must be YYYY-MM format')
   .refine((val) => {
@@ -18,7 +18,7 @@ const router = Router({ mergeParams: true });
 
 router.use(authenticate);
 
-const createEntryBody = z.object({
+export const createEntryBody = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format')
@@ -32,7 +32,7 @@ router.get('/', async (req: Request<{ id: string }>, res) => {
   res.json(entries);
 });
 
-const dateParam = z
+export const dateParam = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format')
   .refine(isValidCalendarDateString, 'Date is not a valid calendar date');
