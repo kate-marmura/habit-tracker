@@ -71,6 +71,7 @@ const mockHabit: Habit = {
 afterEach(() => {
   localStorage.clear();
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 function HabitsListStub() {
@@ -627,6 +628,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('fetches entries on mount and displays marked dates', async () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15), shouldAdvanceTime: true });
     const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValueOnce([
@@ -656,6 +658,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('optimistically marks a day when clicked', async () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15), shouldAdvanceTime: true });
     const { fetchHabitById, fetchEntries, createEntry } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries)
@@ -663,7 +666,7 @@ describe('HabitCalendarPage', () => {
       .mockResolvedValue([{ id: 'e-new', entryDate: '2026-03-10' }]);
     vi.mocked(createEntry).mockResolvedValueOnce({ id: 'e-new', entryDate: '2026-03-10' });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderPage();
     await screen.findByText('Exercise');
 
@@ -683,12 +686,13 @@ describe('HabitCalendarPage', () => {
   });
 
   it('shows error toast when mark mutation fails', async () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15), shouldAdvanceTime: true });
     const { fetchHabitById, fetchEntries, createEntry } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([]);
     vi.mocked(createEntry).mockRejectedValueOnce(new Error('Network error'));
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderPage();
     await screen.findByText('Exercise');
 
@@ -703,7 +707,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('optimistically removes mark when clicking a marked day', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
@@ -729,7 +733,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('shows undo toast after clicking a marked day', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
@@ -751,7 +755,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('restores mark when Undo is clicked and does not call deleteEntry', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
@@ -782,7 +786,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('calls deleteEntry after 3-second undo timeout expires', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
@@ -810,7 +814,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('shows error toast and reverts visual state when deleteEntry fails', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
     vi.mocked(fetchEntries).mockResolvedValue([{ id: 'e1', entryDate: '2026-03-10' }]);
@@ -950,7 +954,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('switching habit ID clears undo toast and commits delete for the previous habit', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries, deleteEntry } = await import('../services/habitsApi');
     const habitB = { ...mockHabit, id: 'def-456', name: 'Read Books' };
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit).mockResolvedValueOnce(habitB);
@@ -997,6 +1001,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('marking a day triggers a stats refetch', async () => {
+    vi.useFakeTimers({ now: new Date(2026, 2, 15), shouldAdvanceTime: true });
     const { fetchHabitById, fetchEntries, createEntry, fetchHabitStats } =
       await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
@@ -1015,7 +1020,7 @@ describe('HabitCalendarPage', () => {
       completedDays: 1,
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderPage();
     await screen.findByText('Exercise');
 
@@ -1033,7 +1038,7 @@ describe('HabitCalendarPage', () => {
   });
 
   it('unmarking a day (after undo expires) triggers a stats refetch', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date(2026, 2, 15) });
     const { fetchHabitById, fetchEntries, deleteEntry, fetchHabitStats } =
       await import('../services/habitsApi');
     vi.mocked(fetchHabitById).mockResolvedValueOnce(mockHabit);
