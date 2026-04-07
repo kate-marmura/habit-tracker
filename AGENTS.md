@@ -112,6 +112,138 @@ curl http://localhost:3001/api/health
 
 ---
 
+## Project-Specific Rules
+
+These rules go beyond general style — they prevent real bugs and inconsistencies found in this codebase.
+
+---
+
+### Rule 1 — Use CalendarDate strings, never raw `Date` objects for habit dates
+
+All habit and entry dates are stored and passed as `YYYY-MM-DD` strings using the project's `CalendarDate` type (see `server/src/lib/calendar-date.ts`). Using JS `Date` objects introduces timezone shift bugs (e.g. a date entered at 11pm UTC-5 becomes the next day in UTC).
+
+```ts
+// Before — timezone-unsafe
+const today = new Date().toISOString().split('T')[0];
+
+// After — use the project's calendar-date utilities
+import { toCalendarDateString } from '../lib/calendar-date';
+const today = toCalendarDateString(new Date());
+```
+
+---
+
+### Rule 2 — Always include `userId` in Prisma queries
+
+Every habit/entry query must be scoped to the authenticated user. Omitting `userId` from a `where` clause is a data isolation bug — one user can read or mutate another user's data.
+
+```ts
+// Before — missing user scope (security bug)
+const habit = await prisma.habit.findUnique({ where: { id } });
+
+// After — always scope by userId
+const habit = await prisma.habit.findUnique({ where: { id, userId } });
+```
+
+---
+
+### Rule 3 — Import `config`, never read `process.env` directly on the server
+
+The server validates all environment variables at startup via `server/src/config.ts`. Reading `process.env` directly bypasses this validation and can produce confusing runtime crashes rather than a clear startup error.
+
+```ts
+// Before — bypasses startup validation
+const secret = process.env.JWT_SECRET;
+
+// After — always use the validated config module
+import { config } from '../config.js';
+const secret = config.JWT_SECRET;
+```
+
+---
+
+### Rule 4 — Invalidate TanStack Query cache after every mutation
+
+After any mutation (create, update, delete, archive, toggle entry), call `queryClient.invalidateQueries(...)` with the relevant query key. Omitting this leaves the UI silently showing stale data.
+
+```ts
+// Before — UI doesn't reflect the change
+onSuccess: () => {
+  onClose();
+}
+
+// After — invalidate so the list re-fetches
+onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: ['habits'] });
+  onClose();
+}
+```
+
+---
+
+### Rule 5 — Export Zod schemas from route files
+
+Zod schemas defined in route files must be exported (e.g. `export const createHabitSchema = ...`). Server integration tests import these schemas to build valid request payloads, keeping test data in sync with validation logic.
+
+```ts
+// Before — unexported, can't be reused in tests
+const schema = z.object({ name: z.string() });
+
+// After — exported for test reuse
+export const createHabitSchema = z.object({ name: z.string() });
+```
+
+---
+
+### Rule 6 — Never mock the database — always use the test Docker DB
+
+Do not use `jest.mock('../lib/prisma')`, in-memory SQLite substitutes, or any other DB fake in server tests. All server tests run against the real test-profile PostgreSQL instance (`localhost:5433`). Mock/prod divergence has caused migrations to fail silently in the past.
+
+```ts
+// Before — mocking hides real query/migration issues
+jest.mock('../lib/prisma', () => ({ habit: { findMany: jest.fn() } }));
+
+// After — use the real test DB (docker compose --profile test up)
+// No mock — import prisma normally and let it hit localhost:5433
+```
+
+---
+
+### Rule 7 — API errors must use `{ error: string }` shape
+
+All Express error responses must use `res.status(4xx/5xx).json({ error: '...' })`. Never use `{ message }`, `{ detail }`, or a plain string body. The client's service layer pattern-matches on `error` — inconsistent shapes cause silent failures.
+
+```ts
+// Before — wrong key, client won't surface this error
+res.status(400).json({ message: 'Invalid input' });
+
+// After — consistent shape the client expects
+res.status(400).json({ error: 'Invalid input' });
+```
+
+---
+
+### Rule 8 — Test file placement: colocate on client, `__tests__/` on server
+
+- **Client:** `ComponentName.test.tsx` lives in the same directory as `ComponentName.tsx`. Never create a `__tests__/` folder under `client/src/`.
+- **Server:** all test files go in `server/src/__tests__/`. Never colocate test files next to source files on the server.
+
+```
+// Before (wrong on client)
+client/src/components/__tests__/ConfirmModal.test.tsx
+
+// After (correct on client)
+client/src/components/ConfirmModal.test.tsx
+
+// Before (wrong on server)
+server/src/routes/habit.routes.test.ts
+
+// After (correct on server)
+server/src/__tests__/habit.routes.test.ts
+```
+
+---
+
 ## Key Docs
 
 | Document | Location |
