@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "postgres": {
+      "command": "node",
+      "args": [
+        "/Users/katemarmura/.nvm/versions/node/v22.15.1/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
+        "postgresql://postgres:postgres@localhost:5432/habit_tracker"
+      ]
+    }
+  }
+}
