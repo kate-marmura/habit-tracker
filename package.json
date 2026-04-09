@@ -17,7 +17,9 @@
     "test:client": "npm test --prefix client",
     "test:server": "npm test --prefix server",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "doctor": "bash scripts/dev-doctor.sh",
+    "doctor:quick": "bash scripts/dev-doctor.sh --quick"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
